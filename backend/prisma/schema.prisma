@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  lineId              String    @id
+  fullname            String
+  phone               String    @unique @db.VarChar(10)
+  email               String?
+  lineProfilePic      String?
+  isTheOne            Boolean?  @default(false)
+  createdAt           DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime? @default(now()) @db.Timestamptz(6)
+  accPointsByBranchID Int?
+  accPoints           Decimal?  @default(0) @db.Decimal //user total amount
+  currentPoints       Decimal?  @default(0) @db.Decimal
+  rights              Int?      @default(0) //special right redeem
+  mostBranchId        String?
+  mostBranchName      String?   @db.VarChar(255)
+  accRights           Int?      @default(0) //luckydraw right
+  theOneId            String?   @db.VarChar
+  allPoints           Decimal?  @default(0) @db.Decimal
+}
+
+model Branch {
+  branchId       String   @id
+  branchName     String   @unique
+  isBranchEnable Boolean? @default(true)
+  stores         Store[]
+}
+
+model Store {
+  storeId       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storeName     String
+  branchId      String?
+  isStoreEnable Boolean? @default(true)
+  branch        Branch?  @relation(fields: [branchId], references: [branchId])
+}
+
+model Receipt {
+  receiptId     Int       @id @default(autoincrement())
+  receiptNo     String?   @db.VarChar
+  receiptDate   DateTime  @db.Timestamptz(6)
+  lineId        String
+  branchId      String?
+  storeId       String?   @db.Uuid
+  amount        Decimal   @db.Decimal
+  receiptImage  String    @db.VarChar
+  status        String    @default("pending") @db.VarChar
+  receiptPoints Decimal?  @default(0) @db.Decimal
+  branchName    String    @db.VarChar
+  storeName     String    @db.VarChar
+  fullname      String    @db.VarChar
+  phone         String    @db.VarChar
+  updatedAt     DateTime? @default(now()) @db.Timestamptz(6)
+  uploadedAt    DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model DailyRedemptionRight {
+  id             Int       @id @default(autoincrement())
+  lineId         String
+  dateEarned     DateTime  @db.Date
+  totalSpent     Decimal    @default(0) @db.Decimal
+  redeemRights   Int        @default(0)
+  usedRights     Int        @default(0)
+  isExpired      Boolean    @default(false)
+  receiptIds     String?    @db.Text
+  redeemedAt     DateTime?  @db.Timestamptz(6)
+  branchId       String?
+  branchName     String?
+  createdAt      DateTime?  @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime?  @default(now()) @db.Timestamptz(6)
+
+  @@unique([lineId, dateEarned], name: "unique_user_date")
+}
+
+model accPointsByBranch {
+  accPointsByBranchID Int      @id @default(autoincrement())
+  branchId            String?
+  branchName          String?
+  lineId              String?
+  fullname            String
+  point               Decimal? @default(0) @db.Decimal
+  phone               String?  @db.VarChar(20)
+}
+
+model branchStock {
+  branchStockId Int       @id @default(autoincrement())
+  branchId      String?
+  branchName    String?
+  isEnable      Boolean?  @default(true)
+  redeemId      String?   @default(dbgenerated("1"))
+  amount        Int?      @default(0)
+  gotRedeemded  Int?      @default(0)
+  updatedAt     DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@unique([branchId, redeemId], map: "unique_branch_redeem")
+}
+
+model ClaimedHistory {
+  claimId       Int       @id @default(autoincrement())
+  redeemId      String
+  lineId        String
+  fullname      String
+  claimedAmount Int?      @default(1)
+  branchId      String
+  branchName    String
+  claimedAt     DateTime? @default(now()) @db.Timestamptz(6)
+  phone         String?   @db.VarChar(20)
+}
+
+model Admin {
+  adminId   String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username  String? @unique
+  password  String
+  role      String
+  isEnable  Boolean
+  branchId  String?
+  isMfa     Boolean
+  secretKey String?
+}
+
+model AdminBranchHistory {
+  branchStockHistoryId Int       @id(map: "adminbranchhistory_pkey") @default(autoincrement())
+  branchId             String
+  adminId              String    @db.Uuid
+  redeemId             String    @db.VarChar(255)
+  editDate             DateTime? @default(now()) @db.Timestamptz(6)
+  amount               Decimal   @db.Decimal
+  updatedStatus        Boolean
+  isEnable             Boolean
+  username             String?   @db.VarChar(255)
+}

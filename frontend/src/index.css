@@ -1,0 +1,164 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@import "tailwindcss";
+
+
+@theme {
+  --font-kanit: "Kanit", "sans-serif";
+}
+
+
+:root {
+  --bg: #71C7AE;   
+    --button: #062F29;
+    --text: #000000;
+    --term-head: #231f20;
+    --light-green: #8EC63F;
+    --text-color-disabled:#727272;
+    --gold: #ffe11d;
+    --black: #000000;
+    --red: #C8102E;
+}
+
+.button-base {
+  @apply px-3 py-2 rounded-md duration-200;
+}
+
+.button-outlined {
+  @apply bg-transparent border-[2px] px-3 py-2 rounded-md  hover:border-slate-400 hover:text-slate-400 duration-200;
+}
+
+.card {
+  @apply  rounded-lg
+}
+
+.x-flex {
+    @apply flex gap-3 items-center
+}
+
+.flex-auto-center {
+  @apply flex justify-center items-center
+}
+
+
+.text-field-aria {
+@apply relative w-full min-w-[200px] h-10
+}
+
+/* Container for the datepicker */
+.react-datepicker {
+  @apply border border-gray-300 rounded-lg shadow-lg bg-white ;
+}
+
+/* Calendar Header (Month and Year Selector) */
+.react-datepicker__header {
+  @apply bg-gray-100 border-b border-gray-200 rounded-t-lg p-3 ;
+}
+
+/* Month and Year text */
+.react-datepicker__current-month {
+  @apply text-gray-800 font-bold text-lg  z-20;
+}
+
+/* Navigation buttons (next/previous months) */
+.react-datepicker__navigation {
+  @apply top-3 w-6 h-6 cursor-pointer z-30;
+}
+
+.react-datepicker__navigation-icon::before {
+  @apply border-gray-600;
+}
+
+/* Weekday header (Mon, Tue, etc.) */
+.react-datepicker__day-names {
+  @apply grid grid-cols-7 gap-0.5 text-gray-700 text-sm font-medium ;
+}
+
+/* Each day cell */
+.react-datepicker__day {
+  @apply text-gray-800 text-sm m-1 hover:bg-blue-100 items-center p-1 ;
+}
+
+/* Selected day */
+.react-datepicker__day--selected,
+.react-datepicker__day--in-selecting-range,
+.react-datepicker__day--in-range {
+  @apply bg-slate-200 text-black font-bold;
+}
+
+.react-datepicker__day:hover {
+  border-radius: 50%;
+  background-color: #DFDFDF !important; /* Change this to your desired color */
+  color: #101828;
+   /* Change this to your desired color */
+}
+
+
+/* Disabled days */
+.react-datepicker__day--disabled {
+  @apply text-gray-300 cursor-not-allowed;
+}
+
+.react-datepicker__day--in-selecting-range {
+  background-color: #DFDFDF !important; 
+  color: #101828;
+}
+
+.react-aria-Calendar {
+  .react-aria-CalendarCell {
+    &[data-disabled] {
+      color: var(--text-color-disabled);
+    }
+  }
+}
+
+
+
+.react-aria-RadioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-color);
+}
+
+.react-aria-Radio {
+  display: flex;
+  align-items: center;
+  gap: 0.571rem;
+  font-size: 1.143rem;
+  color: var(--text-color);
+  forced-color-adjust: none;
+
+  &:before {
+    content: '';
+    display: block;
+    width: 1.286rem;
+    height: 1.286rem;
+    box-sizing: border-box;
+    border: 0.143rem solid var(--border-color);
+    background: var(--field-background);
+    border-radius: 1.286rem;
+    transition: all 200ms;
+  }
+
+  &[data-pressed]:before {
+    border-color: var(--border-color-pressed);
+  }
+
+  &[data-selected] {
+    &:before {
+      border-color: var(--highlight-background);
+      border-width: 0.429rem;
+    }
+
+    &[data-pressed]:before {
+      border-color: var(--highlight-background-pressed);
+    }
+  }
+
+  &[data-focus-visible]:before {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+  }
+}
