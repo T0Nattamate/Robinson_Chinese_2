@@ -7,23 +7,23 @@ const MenuPage = () => {
   const { resetUserProtect, setCanAccessTermsRedeem, setCanAccessTermsUpload } = useAuthStore();
   const { rights, fetchUserRights } = useUserStore();
   const [myRights, setMyRights] = useState(0);
-  const [showAnnouncePopup, setShowAnnouncePopup] = useState(false);
-  
+  //const [showAnnouncePopup, setShowAnnouncePopup] = useState(false);
+
   // Define promotion periods (Bangkok timezone)
   const PROMOTION_PERIODS = [
-    { start: new Date('2025-10-23T00:00:00+07:00'), end: new Date('2025-10-31T23:59:59+07:00') }, //prod
-    //{ start: new Date('2025-10-13T00:00:00+07:00'), end: new Date('2025-10-31T23:59:59+07:00') }, //test
-    { start: new Date('2025-11-25T00:00:00+07:00'), end: new Date('2025-12-03T23:59:59+07:00') },
+    //{ start: new Date('2026-02-02T00:00:00+07:00'), end: new Date('2026-02-24T23:59:59+07:00') }, //prod
+    { start: new Date('2026-01-20T00:00:00+07:00'), end: new Date('2026-02-02T23:59:59+07:00') }, //test
+    //{ start: new Date('2026-02-24T00:00:00+07:00'), end: new Date('2025-12-03T23:59:59+07:00') },
   ];
-  
+
   // Check if current date is within promotion period
   const isInPromotionPeriod = () => {
     const now = new Date();
-    return PROMOTION_PERIODS.some(period => 
+    return PROMOTION_PERIODS.some(period =>
       now >= period.start && now <= period.end
     );
   };
-  
+
   useEffect(() => {
     resetUserProtect();
   }, []);
@@ -31,32 +31,32 @@ const MenuPage = () => {
   useEffect(() => {
     fetchUserRights();
   }, [fetchUserRights]);
-  
+
   useEffect(() => {
     setMyRights(rights);
   }, [rights]);
-  
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   // Check if current date is on or after January 15, 2026
-  const isAfterAnnounceDate = () => {
-    const currentDate = new Date();
-    const announceDate = new Date(2026, 0, 15);
-    return currentDate >= announceDate;
-  };
+  // const isAfterAnnounceDate = () => {
+  //   const currentDate = new Date();
+  //   const announceDate = new Date(2026, 0, 15);
+  //   return currentDate >= announceDate;
+  // };
 
-  const handleAnnounceClick = () => {
-    setShowAnnouncePopup(true);
-  };
+  // const handleAnnounceClick = () => {
+  //   setShowAnnouncePopup(true);
+  // };
 
-  const closePopup = () => {
-    setShowAnnouncePopup(false);
-  };
-  
+  // const closePopup = () => {
+  //   setShowAnnouncePopup(false);
+  // };
+
   const isRedeemActive = isInPromotionPeriod();
-  //const isUploadActive = isInPromotionPeriod();
+  const isUploadActive = isInPromotionPeriod();
   const handleTermsUploadClick = () => {
     setCanAccessTermsUpload();
   };
@@ -64,53 +64,53 @@ const MenuPage = () => {
   const handleTermsRedeemClick = () => {
     setCanAccessTermsRedeem();
   };
-  
+
   return (
     <div className="font-kanit bg-[var(--bg)] w-full min-h-screen md:h-full flex flex-col justify-center items-center relative">
       <div className="w-full bg-white md:w-96 flex items-center justify-center">
-        <img src="banner_major.webp" alt="header1page" className="w-full object-contain" />
+        <img src="//banner_major.webp" alt="header1page" className="w-full object-contain" />
       </div>
       <div className="flex flex-col justify-center items-center w-[90%] md:w-96 md:h-full text-center gap-5 py-5">
         <h1 className="text-3xl text-[var(--text)]">Home</h1>
-        
+
         <h2 className="text-xl text-[var(--text)] pt-10 ">รับสิทธิพิเศษ</h2>
-        <div className="w-full flex justify-center relative">
-          <Link
-              to="/terms-upload"
-              onClick={handleTermsUploadClick}
-              className="w-[90%] transition transform hover:scale-105"
-            >
-              <img 
-                src="btn_1.png" 
-                alt="ลุ้นรางวัล" 
-                className="w-full rounded-md drop-shadow-md" 
-              />
-            </Link>
-        </div>
         {/* <div className="w-full flex justify-center relative">
+          <Link
+            to="/terms-upload"
+            onClick={handleTermsUploadClick}
+            className="w-[90%] transition transform hover:scale-105"
+          >
+            <img
+              src="btn_1.png"
+              alt="ลุ้นรางวัล"
+              className="w-full rounded-md drop-shadow-md"
+            />
+          </Link>
+        </div> */}
+        <div className="w-full flex justify-center relative">
           {isUploadActive ? (
             <Link
               to="/terms-upload"
               onClick={handleTermsUploadClick}
               className="w-[90%] transition transform hover:scale-105"
             >
-              <img 
-                src="เมนู 1 ลุ้นรางวัล.png" 
-                alt="ลุ้นรางวัล" 
-                className="w-full rounded-md drop-shadow-md" 
+              <img
+                src="btn_1.png"
+                alt="ลุ้นรางวัล"
+                className="w-full rounded-md drop-shadow-md"
               />
             </Link>
           ) : (
             <div className="w-[90%] opacity-60 cursor-not-allowed">
-              <img 
-                src="เมนู 1 ลุ้นรางวัล.png" 
-                alt="ลุ้นรางวัล" 
-                className="w-full rounded-md drop-shadow-md filter grayscale" 
+              <img
+                src="btn_1.png"
+                alt="ลุ้นรางวัล"
+                className="w-full rounded-md drop-shadow-md filter grayscale"
               />
             </div>
           )}
-        </div> */}
-        
+        </div>
+
         <div className="w-full flex justify-center relative">
           {isRedeemActive ? (
             <Link
@@ -118,10 +118,10 @@ const MenuPage = () => {
               onClick={handleTermsRedeemClick}
               className="w-[90%] transition transform hover:scale-105"
             >
-              <img 
-                src="btn_2.png" 
-                alt="แลกรับของสมนาคุณ" 
-                className="w-full rounded-md drop-shadow-md" 
+              <img
+                src="btn_2.png"
+                alt="แลกรับของสมนาคุณ"
+                className="w-full rounded-md drop-shadow-md"
               />
               {myRights > 0 && (
                 <div className="absolute -top-2 right-3 rounded-full w-7 h-7 bg-red-500 text-white flex justify-center items-center">
@@ -131,10 +131,10 @@ const MenuPage = () => {
             </Link>
           ) : (
             <div className="w-[90%] opacity-60 cursor-not-allowed relative">
-              <img 
-                src="btn_2.png" 
-                alt="แลกรับของสมนาคุณ" 
-                className="w-full rounded-md drop-shadow-md filter grayscale" 
+              <img
+                src="btn_2.png"
+                alt="แลกรับของสมนาคุณ"
+                className="w-full rounded-md drop-shadow-md filter grayscale"
               />
               {myRights > 0 && (
                 <div className="absolute -top-2 right-3 rounded-full w-7 h-7 bg-red-500 text-white flex justify-center items-center">
@@ -143,7 +143,7 @@ const MenuPage = () => {
               )}
             </div>
           )}
-            {/* <Link
+          {/* <Link
               to="/terms-redeem"
               onClick={handleTermsRedeemClick}
               className="w-[90%] transition transform hover:scale-105"
@@ -167,10 +167,10 @@ const MenuPage = () => {
           to="/history"
           className="w-[90%] transition transform hover:scale-105"
         >
-          <img 
-            src="btn_3.png" 
-            alt="ประวัติการร่วมกิจกรรม" 
-            className="w-full rounded-md drop-shadow-md" 
+          <img
+            src="btn_3.png"
+            alt="ประวัติการร่วมกิจกรรม"
+            className="w-full rounded-md drop-shadow-md"
           />
         </Link>
 
@@ -178,37 +178,37 @@ const MenuPage = () => {
           to="/redeem-history"
           className="w-[90%] transition transform hover:scale-105"
         >
-          <img 
-            src="btn_4.png" 
-            alt="ประวัติการแลกรับของสมนาคุณ" 
-            className="w-full rounded-md drop-shadow-md" 
+          <img
+            src="btn_4.png"
+            alt="ประวัติการแลกรับของสมนาคุณ"
+            className="w-full rounded-md drop-shadow-md"
           />
         </Link>
-        
-        <button
+
+        {/* <button
           onClick={handleAnnounceClick}
           className="w-[90%] transition transform hover:scale-105 border-0 p-0 bg-transparent"
         >
-          <img 
-            src="btn_5.png" 
-            alt="ประกาศรางวัล" 
-            className="w-full rounded-md drop-shadow-md" 
+          <img
+            src="btn_5.png"
+            alt="ประกาศรางวัล"
+            className="w-full rounded-md drop-shadow-md"
           />
-        </button>
+        </button> */}
       </div>
-      
+
       <div className="w-full h-32 md:w-96 relative">
         {/* Footer space */}
       </div>
 
       {/* Announce Popup */}
-      {showAnnouncePopup && (
-        <div 
+      {/* {showAnnouncePopup && (
+        <div
           onClick={closePopup}
           className="fixed inset-0 backdrop-blur-md flex justify-center items-center z-50 px-4"
           style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
         >
-          <div 
+          <div
             onClick={(e) => e.stopPropagation()}
             className="bg-white rounded-lg p-6 max-w-md w-full relative shadow-xl"
           >
@@ -247,7 +247,7 @@ const MenuPage = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

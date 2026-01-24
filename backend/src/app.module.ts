@@ -13,8 +13,9 @@ import { AdminModule } from './admin/admin.module';
 //import { RedisService } from './redis/redis.service';
 import { WebsocketGateway } from './utils/websocket.gateway';
 import { ResetDailyRightsService } from './job/reset-daily-rights.service';
-import { ScheduleModule } from '@nestjs/schedule'; 
+import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaModule } from './prisma/prisma.module';
+import { RewardModule } from './reward/reward.module';
 
 @Module({
   imports: [
@@ -24,15 +25,16 @@ import { PrismaModule } from './prisma/prisma.module';
     FirebaseModule,
     ReceiptModule,
     AdminModule,
+    RewardModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     WinstonModule.forRoot(winstonConfig),
-    PrismaModule, 
+    PrismaModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService, WebsocketGateway,ResetDailyRightsService,],
+  providers: [AppService, WebsocketGateway, ResetDailyRightsService,],
   //exports: [RedisService],
 })
-export class AppModule {}
+export class AppModule { }

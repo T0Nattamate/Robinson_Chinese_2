@@ -36,7 +36,7 @@ export class UserService {
     private readonly logger: LoggerService,
     //private readonly redisService: RedisService,
     private readonly websocketGateway: WebsocketGateway,
-  ) {}
+  ) { }
 
   async createUser(data: RegisterUserDto) {
     // Check for duplicate phone number
@@ -67,9 +67,7 @@ export class UserService {
           : false,
       createdAt: new Date(),
       updatedAt: new Date(),
-      accPointsByBranchID: null,
       accPoints: 0,
-      currentPoints: 0,
       rights: 0,
       accRights: 0,
       mostBranchId: null,
@@ -165,7 +163,7 @@ export class UserService {
     });
 
     // We treat redeemRights as today's remaining
-    const todaysRemaining = daily ? (daily.redeemRights ?? 0) : 0;
+    const todaysRemaining = daily ? Math.max(0, (daily.redeemRights ?? 0) - (daily.usedRights ?? 0)) : 0;
 
     // accRights is still derived from accPoints/luckydrawPoint, if you want to keep that behavior:
     const accPoints = Number(user.accPoints ?? 0);
@@ -180,13 +178,34 @@ export class UserService {
       },
     });
 
+    // Get today's claimed history to check what's already used
+    const todayClaims = await this.prisma.claimedHistory.findMany({
+      where: {
+        lineId,
+        claimedAt: {
+          gte: dateOnly,
+          lte: moment(dateOnly).endOf('day').toDate(),
+        },
+      },
+    });
+
+    const usedMovie = todayClaims.some(c => c.redeemId === 'redeem001');
+    const usedGold = todayClaims.some(c => c.redeemId === 'redeem003' || c.redeemId === 'redeem004');
+
     this.websocketGateway.sendUserInfoUpdate(lineId, {
       user: updatedUser,
       message: 'User info updated in real-time',
     });
 
     return {
-      user: updatedUser,
+      user: {
+        ...updatedUser,
+        eligibleMovie: (daily as any)?.eligibleMovie || false,
+        eligibleGoldA: (daily as any)?.eligibleGoldA || false,
+        eligibleGoldB: (daily as any)?.eligibleGoldB || false,
+        usedMovie,
+        usedGold,
+      },
       message: 'success fetch user info',
     };
   }
@@ -289,7 +308,7 @@ export class UserService {
       const topUsers = await this.prisma.user.findMany({
         where: {
           accPoints: {
-        gte: 50000,
+            gte: 20000,
           },
         },
         take: 15,
@@ -455,7 +474,7 @@ export class UserService {
     };
   }
 
-  
+
   async claimAction(data: ClaimedActionDto) {
     const { lineId, branchId, redeemId } = data;
 
@@ -474,33 +493,15 @@ export class UserService {
       throw new NotFoundException(`Branch with ID ${branchId} not found.`);
     }
 
-    // 3) Check stock
-    const stock = await this.prisma.branchStock.findFirst({
-      where: {
-        branchId,
-        redeemId,
-        isEnable: true,
-        amount: { gt: 0 },
-      },
-    });
-    if (!stock) {
-      this.logger.error(`branch ${existingBranch.branchId} out of stock`);
-      throw new NotFoundException(`จำนวนสิทธิ์แลกซื้อในสาขา ${existingBranch.branchName} หมดแล้ว`);
-    }
-
-    const amountToClaim = data.claimedAmount || 1;
-
-    // 4) Normalize "today" in Asia/Bangkok -> dateOnly
+    // 3) Today's DailyRedemptionRight
     const nowBkk = moment().tz('Asia/Bangkok');
     const todayStr = nowBkk.format('YYYY-MM-DD');
     const dateOnly = new Date(todayStr);
 
-    // 5) Today's DailyRedemptionRight (must not be expired)
-    const daily = await this.prisma.dailyRedemptionRight.findFirst({
+    const daily: any = await this.prisma.dailyRedemptionRight.findFirst({
       where: {
         lineId,
         dateEarned: dateOnly,
-        isExpired: false,
       },
     });
 
@@ -508,21 +509,42 @@ export class UserService {
       throw new ConflictException('วันนี้คุณไม่มีสิทธิ์พิเศษสำหรับการแลกของรางวัล');
     }
 
-    // ✅ Treat redeemRights as "remaining" rights today
-    const remainingRights = daily.redeemRights ?? 0;
-
-    if (remainingRights < amountToClaim) {
-      throw new ConflictException('สิทธิ์พิเศษวันนี้ไม่เพียงพอสำหรับการแลกของรางวัล');
+    // 4) Check One Reward Per Day
+    if (daily.usedRights && daily.usedRights > 0) {
+      throw new ConflictException('คุณได้ใช้สิทธิ์แลกของรางวัลประจำวันไปแล้ว');
     }
 
-    // Optional safety: mirror check with user.rights
-    const userRights = user.rights ?? 0;
-    if (userRights < amountToClaim) {
-      // If you prefer to auto-sync instead, you could do:
-      // await this.prisma.user.update({ where: { lineId }, data: { rights: remainingRights } });
-      // and then re-check. For now, we keep it strict:
-      throw new ConflictException('สิทธิ์รวมของบัญชีไม่เพียงพอ กรุณาติดต่อเจ้าหน้าที่');
+    // 5) Check Eligibility Flag
+    let isEligible = false;
+    if (redeemId === 'redeem001') isEligible = daily.eligibleMovie === true;
+    else if (redeemId === 'redeem003') isEligible = (daily as any).eligibleGoldA === true;
+    else if (redeemId === 'redeem004') isEligible = (daily as any).eligibleGoldB === true;
+
+    if (!isEligible) {
+      throw new ConflictException('คุณยังยอดสะสมไม่เพียงพอสำหรับของรางวัลชิ้นนี้');
     }
+
+    // 6) Check Stock
+    let stock;
+    if (redeemId === 'redeem001') {
+      // Movie is branch-specific
+      stock = await this.prisma.branchStock.findFirst({
+        where: { branchId, redeemId, isEnable: true, amount: { gt: 0 } },
+      });
+    } else if (redeemId === 'redeem003' || redeemId === 'redeem004') {
+      // Gold is Global
+      // We assume global stock is in a special row with branchId = 'GLOBAL' or similar
+      // Or we can just sum but it's better to have a dedicated row for atomic decrement
+      stock = await this.prisma.branchStock.findFirst({
+        where: { branchId: 'GLOBAL', redeemId, isEnable: true, amount: { gt: 0 } },
+      });
+    }
+
+    if (!stock) {
+      throw new ConflictException('ของรางวัลนี้หมดแล้ว');
+    }
+
+    const amountToClaim = 1;
 
     // 7) Transaction
     const result = await this.prisma.$transaction(async (tx) => {
@@ -536,26 +558,17 @@ export class UserService {
         },
       });
 
-      // 7.2 Use today's remaining rights:
-      //    - decrement redeemRights (remaining)
-      //    - increment usedRights (audit)
+      // 7.2 Mark as used today:
       const updatedDaily = await tx.dailyRedemptionRight.update({
         where: { id: daily.id },
         data: {
-          redeemRights: { decrement: amountToClaim }, // remaining --
-          usedRights: { increment: amountToClaim },   // audit ++
+          usedRights: { increment: amountToClaim },
           updatedAt: new Date(),
         },
       });
 
-      // 7.3 Mirror to user
-      const updatedUser = await tx.user.update({
-        where: { lineId },
-        data: {
-          rights: { decrement: amountToClaim },
-          updatedAt: new Date(),
-        },
-      });
+      // 7.3 We don't necessarily need to decrement user.rights for this campaign
+      // since it's based on eligibility flags, but we keep it for audit if rights was 0 initially
 
       // 7.4 History
       const claimedHistory = await tx.claimedHistory.create({
@@ -571,7 +584,7 @@ export class UserService {
         },
       });
 
-      return { updatedStock, updatedDaily, updatedUser, claimedHistory };
+      return { updatedStock, updatedDaily, claimedHistory };
     });
 
     return result;

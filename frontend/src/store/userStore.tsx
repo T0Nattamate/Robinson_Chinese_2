@@ -1,4 +1,4 @@
-import {create} from "zustand";
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import axios from "axios";
 import useAuthStore from "./AuthStore";
@@ -11,14 +11,11 @@ import axiosInceptor from "../utils/axiosInterceptor";
 //   eligibleAt: string;
 // }
 
-interface RedeemItemAvailable {
-  branchId:string;
-  redeemId: number;
-  anpaoName: string;
+interface RewardItem {
+  redeemId: string;
+  rewardName: string;
   remainStock: number;
   isEnable: boolean;
-  gotRedeem: number;
-  updatedAt: string;
 }
 
 interface ConfirmRedeemResponse {
@@ -35,17 +32,18 @@ export type UserProfileResponse = {
     email: string;
     lineId: string;
     lineProfilePic: string;
-    currentPoints: number;
     accPoints: number;
-    allPoints: number;
     accumulatedPoints: number;
     isTheOne: boolean;
     createdAt: string;
     updatedAt: string;
     isLucky: boolean;
     rights: number;
-    accRights:number;
-    redeemedAnpao: number;
+    accRights: number;
+    redeemedReward: number;
+    eligibleMovie: boolean;
+    eligibleGoldA: boolean;
+    eligibleGoldB: boolean;
   };
   message: string;
 };
@@ -55,38 +53,36 @@ interface UserState {
   fullname: string;
   phone: string;
   email: string;
-  currentPoints: number;
   accPoints: number;
-  allPoints: number;
   lineId: string;
   lineProfilePic: string;
   isTheOne: boolean;
   createdAt: string;
   updatedAt: string;
   rights: number;
-  accRights:number;
-  isLucky:boolean;
-  redeemedAnpao: number;
-  selectedRedeemId: number | null;
-  selectedAnpaoName: string | null;
+  accRights: number;
+  isLucky: boolean;
+  redeemedReward: number;
+  eligibleMovie: boolean;
+  eligibleGoldA: boolean;
+  eligibleGoldB: boolean;
+  usedMovie: boolean;
+  usedGold: boolean;
+  selectedRedeemId: string | null;
+  selectedRewardName: string | null;
   uploadCurrentBranch: string;
   setLineId: (lineIdFromInput: string) => void;
   setUploadCurrentBranch: (current: string) => void;
   setLineProfilePic: (linePicUrl: string) => void;
   setUserId: (newUserId: string) => void;
   fetchUserRights: () => Promise<void>;
-  // getAvailablePremium: (userIdgetAvailableRewardsInBranch: string) => Promise<RedeemItem[] | undefined>;
-  getAvailableRewardsInBranch: (
+  getAvailableRewards: (
     branchId: string
-  ) => Promise<RedeemItemAvailable[] | undefined>;
-  // getAvailableMovieTicketsInBranch: (
-  //   branchId: string
-  // ) => Promise<RedeemItemAvailable[] | undefined>;
-  setSelectedReward: (redeemId: number, anpaoName: string) => void;
-  confirmRedeem: (
-    userId: string,
-    redeemId: number,
+  ) => Promise<RewardItem[] | undefined>;
+  setSelectedReward: (redeemId: string, rewardName: string) => void;
+  confirmRedeemReward: (
     branchId: string,
+    redeemId: string
   ) => Promise<ConfirmRedeemResponse | undefined>;
   confirmLoginWithLineId: (
     lineId: string,
@@ -96,7 +92,7 @@ interface UserState {
     userId: string,
     lineProfilePic: string
   ) => Promise<UserProfileResponse>;
-  updateUserData: (updatedUser: Partial<UserState>) =>void;
+  updateUserData: (updatedUser: Partial<UserState>) => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -109,19 +105,22 @@ export const useUserStore = create<UserState>()(
       email: "",
       lineId: "",
       lineProfilePic: "",
-      isLucky:false,
-      currentPoints: 0,
+      isLucky: false,
       accPoints: 0,
-      allPoints: 0,
       selectedRedeemId: null,
-      selectedAnpaoName: null,
+      selectedRewardName: null,
       uploadCurrentBranch: "",
-      isTheOne:false,
-      createdAt:"",
-      updatedAt:"",
-      rights:0,
+      isTheOne: false,
+      createdAt: "",
+      updatedAt: "",
+      rights: 0,
       accRights: 0,
-      redeemedAnpao: 0,
+      redeemedReward: 0,
+      eligibleMovie: false,
+      eligibleGoldA: false,
+      eligibleGoldB: false,
+      usedMovie: false,
+      usedGold: false,
       //actions
       //retrive userId after login to update userId global state
       setUploadCurrentBranch: (current: string) =>
@@ -131,10 +130,10 @@ export const useUserStore = create<UserState>()(
         set({ lineProfilePic: linePicUrl }),
       setUserId: (newUserId: string) => set({ userId: newUserId }),
       updateUserData: (updatedUser: Partial<UserState>) => {
-           set((state) => ({
-                ...state,
-           ...updatedUser,
-         }));
+        set((state) => ({
+          ...state,
+          ...updatedUser,
+        }));
       },
       fetchUserRights: async () => {
         try {
@@ -150,16 +149,19 @@ export const useUserStore = create<UserState>()(
             fullname: response.data.user.fullname,
             phone: response.data.user.phone,
             email: response.data.user.email,
-            currentPoints: response.data.user.currentPoints,
             accPoints: response.data.user.accPoints,
-            allPoints: response.data.user.allPoints,
             lineId: response.data.user.lineId,
             lineProfilePic: response.data.user.lineProfilePic,
             rights: response.data.user.rights,
             accRights: response.data.user.accRights,
             isLucky: response.data.user.isLucky,
             createdAt: response.data.user.createdAt,
-            redeemedAnpao: response.data.user.redeemedAnpao
+            redeemedReward: response.data.user.redeemedReward,
+            eligibleMovie: response.data.user.eligibleMovie,
+            eligibleGoldA: response.data.user.eligibleGoldA,
+            eligibleGoldB: response.data.user.eligibleGoldB,
+            usedMovie: response.data.user.usedMovie,
+            usedGold: response.data.user.usedGold,
           });
         } catch (error) {
           console.error("Error fetching user rights:", error);
@@ -181,20 +183,20 @@ export const useUserStore = create<UserState>()(
       //     console.error("Error getAvailablePremium", error);
       //   }
       // },
-      getAvailableRewardsInBranch: async (branchId) => {
+      getAvailableRewards: async (branchId) => {
         try {
           const accessToken = useAuthStore.getState().accessToken;
           const response = await axiosInceptor.get(
-            `/anpao/available/${branchId}`,
+            `/reward/available/${branchId}`,
             {
               headers: {
                 Authorization: `Bearer ${accessToken}`,
               },
             }
           );
-          return response.data.anpaoAvailable;
+          return response.data;
         } catch (error) {
-          console.error("Error getAvailableRewardsInBranch", error);
+          console.error("Error getAvailableRewards", error);
         }
       },
       // getAvailableMovieTicketsInBranch: async (branchId) => {
@@ -213,30 +215,28 @@ export const useUserStore = create<UserState>()(
       //     console.error("Error getAvailableMovieTicketsInBranch", error);
       //   }
       // },
-      setSelectedReward: (redeemId: number, anpaoName: string) => {
+      setSelectedReward: (redeemId: string, rewardName: string) => {
         set({
           selectedRedeemId: redeemId,
-          selectedAnpaoName: anpaoName,
+          selectedRewardName: rewardName,
         });
       },
-      confirmRedeem: async (
-        userId: string,
-        redeemId: number,
+      confirmRedeemReward: async (
         branchId: string,
+        redeemId: string
       ) => {
         const accessToken = useAuthStore.getState().accessToken;
         try {
           const response = await axiosInceptor.post(
-            `/anpao/redeem`,
+            `/reward/redeem`,
             {
-              userId,
-              redeemId,
               branchId,
+              redeemId,
             },
             {
               headers: {
-                Authorization: `Bearer ${accessToken}`, // Set the Bearer token in the header
-                "Content-Type": "application/json", // Set content type if needed
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
               },
             }
           );
@@ -244,7 +244,6 @@ export const useUserStore = create<UserState>()(
         } catch (error) {
           if (axios.isAxiosError(error)) {
             if (error.response) {
-              //console.log(error.response.data);
               return Promise.reject(error.response.data);
             } else if (error.request) {
               return Promise.reject("No response received from the server.");
@@ -268,11 +267,11 @@ export const useUserStore = create<UserState>()(
               },
             }
           );
-      
+
           if (response?.data?.response) {
             const userData = response.data.response;
             const jwt = response.data.response.jwt;
-      
+
             // Set user details in the store if available
             if (userData) {
               set({
@@ -280,9 +279,7 @@ export const useUserStore = create<UserState>()(
                 fullname: userData.fullname,
                 phone: userData.phone,
                 email: userData.email,
-                currentPoints: userData.currentPoints,
                 accPoints: userData.accPoints,
-                allPoints: userData.allPoints,
                 lineId: userData.lineId,
                 lineProfilePic: userData.lineProfilePic,
                 accRights: userData.accRights,
@@ -291,7 +288,7 @@ export const useUserStore = create<UserState>()(
                 updatedAt: userData.updatedAt,
               });
             }
-      
+
             // Set access token in the auth store if available
             if (jwt) {
               setAccessToken(jwt);
@@ -313,7 +310,7 @@ export const useUserStore = create<UserState>()(
           return Promise.reject("An unknown error occurred.");
         }
       },
-      
+
       // requestOtp: async (phone: string) => {
       //   try {
       //     // Get app_id and message_id from environment variables

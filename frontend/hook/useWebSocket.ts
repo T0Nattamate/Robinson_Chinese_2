@@ -30,9 +30,7 @@ export function useWebSocket(
       // data.user should contain the updated user fields (e.g. currentPoints, accPoints, etc.)
       if (data?.user) {
         updateUserData({
-          currentPoints: data.user.currentPoints,
           accPoints: data.user.accPoints,
-          allPoints: data.user.allPoints,
           rights: data.user.rights,
           accRights: data.user.accRights,
         });

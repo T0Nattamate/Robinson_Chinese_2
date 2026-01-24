@@ -30,7 +30,7 @@ export interface Receipt {
 
 const ReceiptHistory = () => {
   // Extract data fromZustand store
-  const { lineId, accRights,accPoints, fetchUserRights } = useUserStore();
+  const { lineId, accPoints, fetchUserRights } = useUserStore(); //accRights
   const { accessToken } = useAuthStore();
   const pageSize = 10;
 
@@ -43,8 +43,8 @@ const ReceiptHistory = () => {
   const [isPicOpen, setIsPicOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-+ // Use the WebSocket hook, passing lineId and setItems
-+ useWebSocket(lineId, setItems);
+  + // Use the WebSocket hook, passing lineId and setItems
+    + useWebSocket(lineId, setItems);
 
   // Helper to show boolean as a check or x
   // const renderBooleanIcon = (flag: boolean) =>
@@ -168,7 +168,7 @@ const ReceiptHistory = () => {
     <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative">
       {/* Header */}
       <div className="w-full h-full min-h-[400px] bg-white md:w-96">
-        <img src="banner_major.webp" alt="header1page" className="w-full" />
+        <img src="//banner_major.webp" alt="header1page" className="w-full" />
       </div>
 
       <h1 className="text-3xl text-center text-[var(--text)] relative pt-5 pb-5">
@@ -181,9 +181,9 @@ const ReceiptHistory = () => {
           <p className="px-2 py-1 rounded-md text-start bg-white pl-5 font-light">
             ยอดซื้อสะสม : {formatAmount(accPoints)} ฿
           </p>
-          <p className="px-2 py-1 rounded-md text-[var(--button)] text-left bg-white pl-5 font-light">
+          {/* <p className="px-2 py-1 rounded-md text-[var(--button)] text-left bg-white pl-5 font-light">
             จำนวนสิทธิ์ลุ้นรางวัล : {accRights} สิทธิ์
-          </p>
+          </p> */}
         </section>
 
         {/* Link to top-spender */}
@@ -258,71 +258,64 @@ const ReceiptHistory = () => {
                       <tr key={item.receiptId} className="hover:bg-gray-50">
                         {/* 1) วันที่อัพโหลด */}
                         <td
-                          className={`px-2 py-2 ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b rounded-bl-lg"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
+                          className={`px-2 py-2 ${isLastRow
+                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b rounded-bl-lg"
+                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
+                            }`}
                         >
                           {formatThaiDateTime(item.uploadedAt)}
                         </td>
                         {/* 2) สาขาโรบินสัน */}
                         <td
-                          className={`px-2 py-2 ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
+                          className={`px-2 py-2 ${isLastRow
+                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
+                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
+                            }`}
                         >
                           {item.branchName}
                         </td>
                         {/* 3) เลขที่ใบเสร็จ */}
                         <td
-                          className={`px-2 py-2 ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
+                          className={`px-2 py-2 ${isLastRow
+                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
+                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
+                            }`}
                         >
                           {item.receiptNo}
                         </td>
                         {/* 4) ยอดซื้อ */}
                         <td
-                          className={`px-2 py-2 ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
+                          className={`px-2 py-2 ${isLastRow
+                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
+                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
+                            }`}
                         >
                           {formatNumber(parseFloat(item.amount))}฿
                         </td>
                         {/* 5) ร้านค้า */}
                         <td
-                          className={`px-2 py-2 ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
+                          className={`px-2 py-2 ${isLastRow
+                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
+                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
+                            }`}
                         >
                           {item.storeName}
                         </td>
                         {/* 6) วันที่ออกใบเสร็จ */}
                         <td
-                          className={`px-4 py-2 ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
+                          className={`px-4 py-2 ${isLastRow
+                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
+                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
+                            }`}
                         >
                           {item.receiptDate}
                         </td>
                         {/* 7) ภาพใบเสร็จ */}
                         <td
-                          className={`px-2 py-2 underline text-blue-600 cursor-pointer ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
+                          className={`px-2 py-2 underline text-blue-600 cursor-pointer ${isLastRow
+                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
+                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
+                            }`}
                           onClick={() => handleOpenDialog(item.receiptImage)}
                         >
                           Pick link
@@ -359,11 +352,10 @@ const ReceiptHistory = () => {
                         </td> */}
                         {/* 11) สถานะทางแอดมิน */}
                         <td
-                          className={`px-2 py-2 border-r border-black ${
-                            isLastRow
-                              ? "border-[var(--black)] border-l border-r-[var(--black)] border-b  rounded-br-lg"
-                              : "border-l-[var(--black)] border-l border-r-[var(--black)] border-b border-b-slate-300"
-                          } flex items-center justify-center gap-2 py-10`}
+                          className={`px-2 py-2 border-r border-black ${isLastRow
+                            ? "border-[var(--black)] border-l border-r-[var(--black)] border-b  rounded-br-lg"
+                            : "border-l-[var(--black)] border-l border-r-[var(--black)] border-b border-b-slate-300"
+                            } flex items-center justify-center gap-2 py-10`}
                         >
                           {statusDetails?.icon}
                           <p className="whitespace-nowrap">
@@ -399,7 +391,7 @@ const ReceiptHistory = () => {
                   {historyStatus.key === "pending" && (
                     <FaCircleMinus className="text-slate-500" />
                   )}
-                  {["rejected", "invalidImage", "amountDontMatch","breakRules","duplicated"].includes(
+                  {["rejected", "invalidImage", "amountDontMatch", "breakRules", "duplicated"].includes(
                     historyStatus.key
                   ) && <FaCircleXmark className="text-red-700" />}
                 </div>

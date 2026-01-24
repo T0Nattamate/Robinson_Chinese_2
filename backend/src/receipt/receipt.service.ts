@@ -17,7 +17,7 @@ export class ReceiptService {
     private readonly firebaseService: FirebaseService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
-  ) {}
+  ) { }
 
   async createReceipt(data: CreateReceiptDto, file: Express.Multer.File) {
     const parsedDate = new Date(data.receiptDate);
@@ -77,16 +77,16 @@ export class ReceiptService {
       try {
         receiptImageUrl = await this.firebaseService.uploadFile(
           file,
-          'receiptsCelebration',
+          'receiptsCNY2026',
           `${Date.now()}-${data.lineId}`,
         );
       } catch (error) {
         this.logger.error(
-          'Failed to upload receipt image to Firebase to receiptsCelebration',
+          'Failed to upload receipt image to Firebase to receiptsCNY2026',
           ':createReceipt',
         );
         throw new BadRequestException(
-          'Failed to upload receipt image to Firebase to receiptsCelebration',
+          'Failed to upload receipt image to Firebase to receiptsCNY2026'
         );
       }
     }

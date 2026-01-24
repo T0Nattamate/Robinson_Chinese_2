@@ -38,10 +38,8 @@ export type Customer = {
   createdAt: string;
   updatedAt: string;
   accPointsByBranch: string;
-  allPoints: string;
   accPoints: string;
   rights: number;
-  currentPoints: number;
   mostbranchId: string;
   accRights: number;
   theOneId: string;
@@ -105,7 +103,7 @@ const CustomerAdmin = () => {
       setSortOrder(null);
     }
   };
-  
+
   //console.log("sortOrder", sortOrder);
 
   //API calling
@@ -144,7 +142,7 @@ const CustomerAdmin = () => {
         );
         const { data, totalCount, nextCursor } = response;
         //console.log("data: ", data);
-        
+
         // CRITICAL: Clear old stack and start fresh
         setLastVisibleStack([]);
         if (nextCursor !== null && nextCursor !== undefined) {
@@ -286,7 +284,7 @@ const CustomerAdmin = () => {
       const formattedEndDate = endDate
         ? formatDateToYYYYMMDD(endDate)
         : undefined;
-    
+
       await downloadCustomerAdmin(
         phoneFilter,
         the1Filter !== null ? (the1Filter ? "true" : "false") : null,
@@ -295,7 +293,7 @@ const CustomerAdmin = () => {
         formattedStartDate,
         formattedEndDate
       );
-  
+
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -308,7 +306,7 @@ const CustomerAdmin = () => {
       });
     }
   };
-  
+
   const handleDownloadExcelLuckyDraw = async () => {
     try {
       const formattedStartDate = startDate
@@ -317,7 +315,7 @@ const CustomerAdmin = () => {
       const formattedEndDate = endDate
         ? formatDateToYYYYMMDD(endDate)
         : undefined;
-  
+
       await downloadCustomerAdminLuckyDraw(
         phoneFilter,
         the1Filter !== null ? (the1Filter ? "true" : "false") : null,
@@ -326,10 +324,10 @@ const CustomerAdmin = () => {
         formattedStartDate,
         formattedEndDate
       );
-  
+
     } catch (error) {
       let errorMessage = "ไม่พบรายชื่อผู้ใช้ที่ยังไม่เคยได้รับรางวัล";
-  
+
       if (error instanceof Error) {
         if (error.message === "Network Error") {
           errorMessage = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้";
@@ -337,7 +335,7 @@ const CustomerAdmin = () => {
           errorMessage = "ไม่พบข้อมูลสำหรับการดาวน์โหลด";
         }
       }
-  
+
       Swal.fire({
         icon: "error",
         text: errorMessage,
@@ -360,21 +358,21 @@ const CustomerAdmin = () => {
       {" "}
       <section className="mt-0 m-8 ">
         <div className="flex flex-col md:flex-row gap-3 items-start md:items-end">
-        <h1 className="text-3xl text-[var(--text)] mt-10">
-          {/* 1) Sort states */}
-          {sortOrder === null ? (
-            "รายชื่อลูกค้าทั้งหมด"
-          ) : (
-            "รายชื่อลูกค้า เรียงตามลำดับ Top spender"
-          )}
+          <h1 className="text-3xl text-[var(--text)] mt-10">
+            {/* 1) Sort states */}
+            {sortOrder === null ? (
+              "รายชื่อลูกค้าทั้งหมด"
+            ) : (
+              "รายชื่อลูกค้า เรียงตามลำดับ Top spender"
+            )}
 
-          {/* 2) The1 filter logic */}
-          {the1Filter === true
-            ? " ที่เป็นสมาชิก the 1"
-            : the1Filter === false
-            ? " ที่ไม่ได้เป็นสมาชิก the 1"
-            : ""}
-        </h1>
+            {/* 2) The1 filter logic */}
+            {the1Filter === true
+              ? " ที่เป็นสมาชิก the 1"
+              : the1Filter === false
+                ? " ที่ไม่ได้เป็นสมาชิก the 1"
+                : ""}
+          </h1>
 
         </div>
         {/* Filter */}
@@ -465,17 +463,16 @@ const CustomerAdmin = () => {
                
                 </div>
               </div>*/}
-            </div> 
+            </div>
             {/* Filter row 2 */}
             <div className="w-full flex gap-3 md:flex-row flex-col ">
               <div
-                className={`w-44 h-10 gap-3 flex justify-center items-center rounded-md mt-0 cursor-pointer  ${
-                  the1Filter === null
+                className={`w-44 h-10 gap-3 flex justify-center items-center rounded-md mt-0 cursor-pointer  ${the1Filter === null
                     ? "bg-[#95a59f] text-white"
                     : the1Filter === true
-                    ? "bg-[var(--button)] text-red-600"
-                    : "bg-[var(--button)] text-white"
-                }`}
+                      ? "bg-[var(--button)] text-red-600"
+                      : "bg-[var(--button)] text-white"
+                  }`}
                 onClick={() => {
                   setThe1Filter((prev) => {
                     if (prev === null) {
@@ -491,18 +488,17 @@ const CustomerAdmin = () => {
                 {the1Filter === null
                   ? "ไม่ได้ระบุสถานะสมาชิก"
                   : the1Filter === true
-                  ? "เป็นสมาชิก the 1"
-                  : "ไม่ได้เป็นสมาชิก the 1"}
+                    ? "เป็นสมาชิก the 1"
+                    : "ไม่ได้เป็นสมาชิก the 1"}
               </div>
 
               <section className="flex flex-row ">
                 <div
                   className={`
                     w-60 h-10 gap-3 flex justify-center items-center rounded-md mt-0 cursor-pointer
-                    ${
-                      sortOrder === null
-                        ? "bg-[#95a59f] text-white"
-                        : "border-slate-400 bg-[var(--button)] text-white"
+                    ${sortOrder === null
+                      ? "bg-[#95a59f] text-white"
+                      : "border-slate-400 bg-[var(--button)] text-white"
                     }
                   `}
                   onClick={handleSort}
@@ -542,10 +538,10 @@ const CustomerAdmin = () => {
                 <td className="w-12  border-b border-b-slate-400 pb-3">
                   อัพเดทล่าสุดเมื่อ
                 </td>
-                <td className="w-12 border-b border-b-slate-400 pb-3"> 
+                <td className="w-12 border-b border-b-slate-400 pb-3">
                   รูปโปรไฟล์
                 </td>
-                
+
                 <td className="w-28 border-b border-b-slate-400 pb-3 ">
                   ชื่อ-นามสกุล
                 </td>
@@ -569,7 +565,7 @@ const CustomerAdmin = () => {
                   {" "}
                   สิทธิ์แลกรับ<br></br>กระเป๋า
                 </td> */}
-                
+
                 <td className="w-10  border-b border-b-slate-400 pb-3 ">
                   {" "}
                   สิทธิ์ลุ้นรางวัล
@@ -599,7 +595,7 @@ const CustomerAdmin = () => {
                     key={customer.lineId}
                     className="font-light hover:bg-slate-100 duration-200"
                   >
-                    
+
                     <td className="w-12 border-b border-b-slate-400 pb-3">
                       {formatThaiDateTime(customer.updatedAt)}
                     </td>
@@ -652,7 +648,7 @@ const CustomerAdmin = () => {
                     {/* <td className="w-14 border-b border-b-slate-400 pb-3">
                       {customer.rights}
                     </td> */}
-                    
+
                     <td className="w-10 border-b border-b-slate-400 pb-3">
                       {formatNumber(customer.accRights)}
                     </td>
@@ -667,7 +663,7 @@ const CustomerAdmin = () => {
                       )}
                     </td>
                     <td className="w-16 border-b border-b-slate-400 pb-3">
-                      {customer.mostBranchName ? customer.mostBranchName: "-"}
+                      {customer.mostBranchName ? customer.mostBranchName : "-"}
                     </td>
                   </tr>
                 ))
@@ -693,7 +689,7 @@ const CustomerAdmin = () => {
               <SelectValue
                 className="flex-1 truncate data-[placeholder]:font-base  text-slate-500"
 
-                //className={InputCss}
+              //className={InputCss}
               />
             </Button>
             <Popover

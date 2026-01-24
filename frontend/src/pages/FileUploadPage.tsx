@@ -89,8 +89,8 @@ const FileUploadPage = () => {
     branchQuery === ""
       ? branches
       : branches.filter((b) =>
-          b.branchName.toLowerCase().includes(branchQuery.toLowerCase())
-        );
+        b.branchName.toLowerCase().includes(branchQuery.toLowerCase())
+      );
 
   // 1) Convert CalendarDate -> "Wed Dec 04 2024 15:25:41 GMT+0700 (Indochina Time)"
   function calendarDateToJSString(date: CalendarDate): string {
@@ -109,65 +109,65 @@ const FileUploadPage = () => {
 
   // Called when user picks a branch from the branch combobox
   const handleBranchChange = (selectedBranchName: string) => {
-  const selectedBranch = branches.find(
-    (branch) => branch.branchName === selectedBranchName
-  );
-  
-  if (!selectedBranch) {
-    console.warn("Branch not found:", selectedBranchName);
-    return;
-  }
-  
-  setBranchName(selectedBranch.branchName);
-  
-  // console.log("=== DEBUG: Store Deduplication ===");
-  // console.log("Branch:", selectedBranch.branchName);
-  // console.log("Total stores in branch:", selectedBranch.stores?.length);
-  
-  const enabledStores = selectedBranch.stores?.filter((store) => store.isStoreEnable) || [];
-  //console.log("Enabled stores:", enabledStores.length);
-  
-  const storeNames = enabledStores.map((store) => store.storeName.trim());
-  //console.log("All store names:", storeNames);
-  
-  // Find duplicates
-  const storeCount: { [key: string]: number } = {};
-  storeNames.forEach((name) => {
-    storeCount[name] = (storeCount[name] || 0) + 1;
-  });
-  
-  // const duplicates = Object.entries(storeCount)
-  //   .filter(([_, count]) => count > 1)
-  //   .map(([name, count]) => ({ name, count }));
-  
-  // if (duplicates.length > 0) {
-  //   //console.log("🔴 DUPLICATES FOUND:");
-  //   duplicates.forEach(({ name, count }) => {
-  //     //console.log(`  - "${name}" appears ${count} times`);
-  //   });
-    
-  //   // Show which store IDs have duplicate names
-  //   duplicates.forEach(({ name }) => {
-  //     const duplicateStores = enabledStores.filter(
-  //       (store) => store.storeName.trim() === name
-  //     );
-  //     //console.log(`  📍 Store "${name}" - IDs:`, duplicateStores.map(s => s.storeId));
-  //   });
-  // } else {
-  //   //console.log("✅ No duplicates found");
-  // }
-  
-  const uniqueStores = [...new Set(storeNames)];
-  //console.log("Unique stores:", uniqueStores);
-  //console.log("Total removed duplicates:", storeNames.length - uniqueStores.length);
-  
-  uniqueStores.sort((a, b) => a.localeCompare(b, 'th'));
-  
-  setStores(uniqueStores);
-  setSelectedStore("");
-  setQuery("");
-  setOtherStoreName("");
-};
+    const selectedBranch = branches.find(
+      (branch) => branch.branchName === selectedBranchName
+    );
+
+    if (!selectedBranch) {
+      console.warn("Branch not found:", selectedBranchName);
+      return;
+    }
+
+    setBranchName(selectedBranch.branchName);
+
+    // console.log("=== DEBUG: Store Deduplication ===");
+    // console.log("Branch:", selectedBranch.branchName);
+    // console.log("Total stores in branch:", selectedBranch.stores?.length);
+
+    const enabledStores = selectedBranch.stores?.filter((store) => store.isStoreEnable) || [];
+    //console.log("Enabled stores:", enabledStores.length);
+
+    const storeNames = enabledStores.map((store) => store.storeName.trim());
+    //console.log("All store names:", storeNames);
+
+    // Find duplicates
+    const storeCount: { [key: string]: number } = {};
+    storeNames.forEach((name) => {
+      storeCount[name] = (storeCount[name] || 0) + 1;
+    });
+
+    // const duplicates = Object.entries(storeCount)
+    //   .filter(([_, count]) => count > 1)
+    //   .map(([name, count]) => ({ name, count }));
+
+    // if (duplicates.length > 0) {
+    //   //console.log("🔴 DUPLICATES FOUND:");
+    //   duplicates.forEach(({ name, count }) => {
+    //     //console.log(`  - "${name}" appears ${count} times`);
+    //   });
+
+    //   // Show which store IDs have duplicate names
+    //   duplicates.forEach(({ name }) => {
+    //     const duplicateStores = enabledStores.filter(
+    //       (store) => store.storeName.trim() === name
+    //     );
+    //     //console.log(`  📍 Store "${name}" - IDs:`, duplicateStores.map(s => s.storeId));
+    //   });
+    // } else {
+    //   //console.log("✅ No duplicates found");
+    // }
+
+    const uniqueStores = [...new Set(storeNames)];
+    //console.log("Unique stores:", uniqueStores);
+    //console.log("Total removed duplicates:", storeNames.length - uniqueStores.length);
+
+    uniqueStores.sort((a, b) => a.localeCompare(b, 'th'));
+
+    setStores(uniqueStores);
+    setSelectedStore("");
+    setQuery("");
+    setOtherStoreName("");
+  };
 
   // If there's a saved branch from store, pre-load the stores
   useEffect(() => {
@@ -176,16 +176,16 @@ const FileUploadPage = () => {
       const selectedBranch = branches.find(
         (branch) => branch.branchName === uploadCurrentBranch
       );
-      
+
       if (selectedBranch) {
         // Same deduplication logic
         const storeNames = selectedBranch.stores
           ?.filter((store) => store.isStoreEnable)
           ?.map((store) => store.storeName.trim()) || [];
-        
+
         const uniqueStores = [...new Set(storeNames)];
         uniqueStores.sort((a, b) => a.localeCompare(b, 'th'));
-        
+
         setStores(uniqueStores);
       } else {
         console.warn("Branch not found in branches for initial setup");
@@ -198,10 +198,10 @@ const FileUploadPage = () => {
     query === ""
       ? [...stores]
       : [
-          ...stores.filter((store) =>
-            store.toLowerCase().includes(query.toLowerCase())
-          ),
-        ];
+        ...stores.filter((store) =>
+          store.toLowerCase().includes(query.toLowerCase())
+        ),
+      ];
 
   const handleStoreChange = (store: string) => {
     setSelectedStore(store);
@@ -455,9 +455,9 @@ const FileUploadPage = () => {
 
       {/* Header */}
       <div className="w-full h-full min-h-[400px] md:w-96 relative bg-white">
-        <img src="banner_major.webp" alt="header1page" className="w-full" />
+        <img src="//banner_major.webp" alt="header1page" className="w-full" />
       </div>
-    
+
       <h1 className="text-3xl text-[var(--text)] pt-8 pb-12 relative">
         ส่งใบเสร็จ ลุ้นรางวัล
       </h1>
@@ -642,7 +642,7 @@ const FileUploadPage = () => {
               placeholder="*เลขที่ใบเสร็จ"
               value={receiptNo}
               onChange={(e) => {
-                  setReceiptNo(e.target.value);
+                setReceiptNo(e.target.value);
               }}
               onKeyDown={(e) => {
                 if (e.key === " ") {
@@ -697,7 +697,7 @@ const FileUploadPage = () => {
 
           {/* File Upload */}
           <FileTrigger
-            acceptedFileTypes={["image/jpeg","image/png","image/webp","image/heic"]}
+            acceptedFileTypes={["image/jpeg", "image/png", "image/webp", "image/heic"]}
             onSelect={(e) => {
               if (e) {
                 handleFileSelect(Array.from(e));
@@ -723,7 +723,7 @@ const FileUploadPage = () => {
 
           {/* Preview */}
           <FileTrigger
-            acceptedFileTypes={["image/jpeg","image/png","image/webp","image/heic"]}
+            acceptedFileTypes={["image/jpeg", "image/png", "image/webp", "image/heic"]}
             onSelect={(e) => {
               if (e) {
                 handleFileSelect(Array.from(e));
@@ -759,8 +759,8 @@ const FileUploadPage = () => {
           </Link>
         </p>
 
-         {/* ADD: Step 3) Show the progress bar if > 0% */}
-         {uploadProgress > 0 && uploadProgress < 100 && (
+        {/* ADD: Step 3) Show the progress bar if > 0% */}
+        {uploadProgress > 0 && uploadProgress < 100 && (
           <div className="w-4/5 bg-gray-200 rounded-full h-5 mt-3">
             <div
               className="bg-green-500 h-5 rounded-full"
@@ -774,7 +774,7 @@ const FileUploadPage = () => {
         {uploadProgress === 100 && (
           <p className="text-sm text-green-600 mt-2">อัปโหลดเสร็จสมบูรณ์!</p>
         )}
-        
+
         {/* Submit Button */}
         <button
           onClick={handleSubmit}

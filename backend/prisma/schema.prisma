@@ -8,23 +8,20 @@ datasource db {
 }
 
 model User {
-  lineId              String    @id
-  fullname            String
-  phone               String    @unique @db.VarChar(10)
-  email               String?
-  lineProfilePic      String?
-  isTheOne            Boolean?  @default(false)
-  createdAt           DateTime? @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime? @default(now()) @db.Timestamptz(6)
-  accPointsByBranchID Int?
-  accPoints           Decimal?  @default(0) @db.Decimal //user total amount
-  currentPoints       Decimal?  @default(0) @db.Decimal
-  rights              Int?      @default(0) //special right redeem
-  mostBranchId        String?
-  mostBranchName      String?   @db.VarChar(255)
-  accRights           Int?      @default(0) //luckydraw right
-  theOneId            String?   @db.VarChar
-  allPoints           Decimal?  @default(0) @db.Decimal
+  lineId         String    @id
+  fullname       String
+  phone          String    @unique @db.VarChar(10)
+  email          String?
+  lineProfilePic String?
+  isTheOne       Boolean?  @default(false)
+  createdAt      DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime? @default(now()) @db.Timestamptz(6)
+  accPoints      Decimal?  @default(0) @db.Decimal
+  rights         Int?      @default(0)
+  mostBranchId   String?
+  mostBranchName String?   @db.VarChar(255)
+  accRights      Int?      @default(0)
+  theOneId       String?   @db.VarChar
 }
 
 model Branch {
@@ -35,11 +32,13 @@ model Branch {
 }
 
 model Store {
-  storeId       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  storeName     String
-  branchId      String?
-  isStoreEnable Boolean? @default(true)
-  branch        Branch?  @relation(fields: [branchId], references: [branchId])
+  storeId         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storeName       String
+  branchId        String?
+  isStoreEnable   Boolean? @default(true)
+  category        String   @default("GENERAL")
+  isParticipating Boolean  @default(true)
+  branch          Branch?  @relation(fields: [branchId], references: [branchId])
 }
 
 model Receipt {
@@ -62,19 +61,22 @@ model Receipt {
 }
 
 model DailyRedemptionRight {
-  id             Int       @id @default(autoincrement())
-  lineId         String
-  dateEarned     DateTime  @db.Date
-  totalSpent     Decimal    @default(0) @db.Decimal
-  redeemRights   Int        @default(0)
-  usedRights     Int        @default(0)
-  isExpired      Boolean    @default(false)
-  receiptIds     String?    @db.Text
-  redeemedAt     DateTime?  @db.Timestamptz(6)
-  branchId       String?
-  branchName     String?
-  createdAt      DateTime?  @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime?  @default(now()) @db.Timestamptz(6)
+  id            Int       @id @default(autoincrement())
+  lineId        String
+  dateEarned    DateTime  @db.Date
+  totalSpent    Decimal   @default(0) @db.Decimal
+  redeemRights  Int       @default(0)
+  usedRights    Int       @default(0)
+  isExpired     Boolean   @default(false)
+  receiptIds    String?
+  redeemedAt    DateTime? @db.Timestamptz(6)
+  branchId      String?
+  branchName    String?
+  createdAt     DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime? @default(now()) @db.Timestamptz(6)
+  eligibleGoldA Boolean   @default(false)
+  eligibleGoldB Boolean   @default(false)
+  eligibleMovie Boolean   @default(false)
 
   @@unique([lineId, dateEarned], name: "unique_user_date")
 }

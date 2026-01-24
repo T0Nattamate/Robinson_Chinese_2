@@ -6,14 +6,11 @@ import ConfirmRedeemDialog from "../components/dialogs/ConfirmRedeemDialog";
 import { Link } from "react-router-dom";
 //import { LuCopyright } from "react-icons/lu";
 
-interface RedeemItemAvailable {
-  branchId:string;
-  redeemId: number;
-  anpaoName: string;
+interface RewardItem {
+  redeemId: string;
+  rewardName: string;
   remainStock: number;
   isEnable: boolean;
-  gotRedeem: number;
-  updatedAt: string;
 }
 
 const AvailableRedeemPage = () => {
@@ -30,7 +27,7 @@ const AvailableRedeemPage = () => {
     const fetchDataRedeem = async () => {
       try {
         await fetchUserRights(); //fetch new update
-        
+
       } catch (error) {
         //console.log("redeemPage error", error);
       }
@@ -40,45 +37,45 @@ const AvailableRedeemPage = () => {
   }, []);
   const {
     lineId,
-    getAvailableRewardsInBranch,
+    getAvailableRewards,
     setSelectedReward,
-    rights,
-    fullname,
     fetchUserRights,
+    eligibleMovie,
+    eligibleGoldA,
+    eligibleGoldB,
   } = useUserStore();
-  const [redeemItems, setRedeemItems] = useState<RedeemItemAvailable[]>([]);
+  const [rewardItems, setRewardItems] = useState<RewardItem[]>([]);
 
   useEffect(() => {
     if (!branchId) return;
-    
-    const fetchDataRedeemEachBranch = async () => {
+
+    const fetchDataRewards = async () => {
       try {
-        const response = await getAvailableRewardsInBranch(branchId);
+        const response = await getAvailableRewards(branchId);
         if (response) {
-          //console.log("response: ", response);
-          setRedeemItems(response);
+          setRewardItems(response);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-  
-    fetchDataRedeemEachBranch();
-  }, [getAvailableRewardsInBranch, lineId, branchId]);
-  
+
+    fetchDataRewards();
+  }, [getAvailableRewards, lineId, branchId]);
+
   // Second useEffect to log the updated state
   useEffect(() => {
-    if (redeemItems) {
-      //console.log("reward: ", redeemItems);
+    if (rewardItems) {
+      //console.log("reward: ", rewardItems);
     }
-  }, [redeemItems]);
+  }, [rewardItems]);
 
   //dialog logic
   const [isConfirmRedeemOpen, setIsConfirmRedeemOpen] =
     useState<boolean>(false);
 
-  const handleConfirmRedeemOpen = ( redeemId: number,anpaoName: string) => {
-    setSelectedReward(redeemId, anpaoName);
+  const handleConfirmRedeemOpen = (redeemId: string, rewardName: string) => {
+    setSelectedReward(redeemId, rewardName);
     setIsConfirmRedeemOpen(true);
   };
 
@@ -96,73 +93,81 @@ const AvailableRedeemPage = () => {
         />
         {/* Title in the white space */}
         <h1 className="text-3xl text-center text-[var(--gold)] relative -top-12">
-          แลกรับอั่งเปา
+          แลกรับรางวัล
         </h1>
       </div>
       <div className="flex flex-col justify-start items-center w-[90%] md:w-96 text-center gap-5 p-5 relative -top-10">
-        
+
         {selectedBranch ? (
           <div className="text-2xl text-[var(--ghost-white)]"> โรบินสันไลฟ์สไตล์ {selectedBranch}</div>
         ) : (
           <div className="text-3xl text-[var(--ghost-white)] mt-5">ไม่พบสาขา</div>
         )}
 
-        <section className="rounded-lg  p-1 px-5 text-[var(--dark-green)] bg-white mb-8">
-        <p>
-          จำนวนการแลกรับสิทธิ์ :{" "}
-          <span className="">{rights > 0 ? rights - (rights - 1) : 0}</span>{" "}
-          สิทธิ์
-        </p>
+        <section className="rounded-lg p-1 px-5 text-[var(--dark-green)] bg-white mb-2">
+          <p>
+            คุณมีสิทธิ์แลกรับรางวัล
+          </p>
         </section>
 
-        {(redeemItems.length > 0 && redeemItems[0].remainStock > 0) ? (
-            <div>
-              <p className="text-gray-300 text-3xl">
-                ซินเจียยู่อี่ ซินนี้ฮวดใช้
-              </p>
-              <div className="my-6">
-                <p className="text-[var(--ghost-white)] text-lg font-semibold">
-                  อั่งเปาของคุณ ({fullname})
-                </p>
-              </div>
-              <img
-                src="/ungpao.png"
-                alt="อั่งเปา"
-                className="w-32 mx-auto"
-              />
-              <button
-                className="block w-[80%] mx-auto my-4 transform transition hover:scale-105"
-                onClick={() => {
-                  if (redeemItems && redeemItems.length > 0) {
-                    handleConfirmRedeemOpen(
-                      redeemItems[0].redeemId,
-                      redeemItems[0].anpaoName
-                    );
-                  }
-                }}
+        <div className="w-full flex flex-col gap-4 overflow-y-auto pb-10">
+          {rewardItems.map((item) => {
+            let isEligible = false;
+            // Map redeemId to eligibility flag
+            if (item.redeemId === 'redeem001') isEligible = eligibleMovie;
+            else if (item.redeemId === 'redeem003') isEligible = eligibleGoldA;
+            else if (item.redeemId === 'redeem004') isEligible = eligibleGoldB;
+
+            const isOutOfStock = item.remainStock <= 0;
+            const canRedeem = isEligible && !isOutOfStock && item.isEnable;
+
+            return (
+              <div
+                key={item.redeemId}
+                className={`bg-white rounded-xl p-4 flex flex-col items-center gap-2 border-2 ${canRedeem ? 'border-[var(--gold)]' : 'border-gray-200 opacity-70'}`}
               >
-                <img
-                  src="/Button_receivedUngpao.png"
-                  alt="Redeem"
-                  className="w-full h-auto"
-                />
-              </button>
-            </div>
-          ) : (
-            <div className=" text-xl bg-white text-black rounded-md border-black border-2 h-[8rem] flex flex-col items-center justify-center py-4">
-              <p>สิทธิ์แลกรับอั่งเปาโรบินสันไลฟ์สไตล์ {selectedBranch} เต็มจำนวนสิทธิ์แล้วค่ะ ขอบคุณค่ะ</p>
-            </div>
-          )}
-          <Link
-                  to="/menu"
-                  className="block w-[80%] mx-auto transform transition hover:scale-105"
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                  {/* Icon or simplified image based on type */}
+                  {item.redeemId === 'redeem001' ? '🎬' : '✨'}
+                </div>
+                <h3 className="text-lg font-bold text-[var(--primary)]">{item.rewardName}</h3>
+                <p className="text-sm text-gray-500">คงเหลือ: {item.remainStock} สิทธิ์</p>
+
+                {!isEligible && (
+                  <p className="text-xs text-red-500 italic">ยอดสะสมของคุณยังไม่ถึงเกณฑ์</p>
+                )}
+
+                <button
+                  disabled={!canRedeem}
+                  className={`w-full py-2 rounded-lg font-bold transition ${canRedeem ? 'bg-[var(--gold)] text-white hover:scale-105' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                  onClick={() => handleConfirmRedeemOpen(item.redeemId, item.rewardName)}
                 >
-                  <img
-                    src="/Button_backMain.png"
-                    alt="กลับสู่หน้าหลัก"
-                    className="w-full h-auto"
-                  />
-          </Link>
+                  {isOutOfStock ? 'หมดแล้ว' : 'แลกรับรางวัล'}
+                </button>
+
+                {/* Specific option for BOTH if it's Gold and user is eligible for both */}
+                {item.redeemId === 'redeem003' && eligibleGoldA && eligibleGoldB && (
+                  <button
+                    className="w-full py-1 text-xs text-[var(--gold)] underline"
+                    onClick={() => handleConfirmRedeemOpen('GOLD_BOTH', 'ทองทั้ง 2 รูปแบบ')}
+                  >
+                    รับทั้ง 2 แบบ (ใช้ 1 สิทธิ์รวม)
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <Link
+          to="/menu"
+          className="block w-[80%] mx-auto transform transition hover:scale-105"
+        >
+          <img
+            src="/Button_backMain.png"
+            alt="กลับสู่หน้าหลัก"
+            className="w-full h-auto"
+          />
+        </Link>
       </div>
       <ConfirmRedeemDialog
         isConfirmRedeemOpen={isConfirmRedeemOpen}
@@ -170,6 +175,6 @@ const AvailableRedeemPage = () => {
       />
     </div>
   );
-};  
+};
 
 export default AvailableRedeemPage;

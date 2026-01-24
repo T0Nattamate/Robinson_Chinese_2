@@ -5,7 +5,7 @@ import useBranchStore from "../store/BranchStore";
 import BasicOverlay from "../components/overlay/BasicOverlay";
 
 const TermsFileUpload = () => {
-  const { setAcceptUpload,resetTermsAccess } = useAuthStore();
+  const { setAcceptUpload, resetTermsAccess } = useAuthStore();
   const { fetchBranches } = useBranchStore();
   const navigate = useNavigate();
 
@@ -35,7 +35,7 @@ const TermsFileUpload = () => {
       {/* Header image container */}
       <div className="w-full bg-white md:w-96 flex items-center justify-center">
         <img
-          src="banner_major.webp"
+          src="//banner_major.webp"
           alt="header1page"
           className="w-full object-contain"
         />

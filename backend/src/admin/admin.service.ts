@@ -35,7 +35,7 @@ export class AdminService {
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
     private readonly websocketGateway: WebsocketGateway,
-  ) {}
+  ) { }
 
   async createAdmin(data: CreateAdminDto) {
     // Check for duplicate username
@@ -354,363 +354,284 @@ export class AdminService {
       );
     }
   }
-  
-  async approveStatus(
-  receiptId: number,
-  lineId: string,
-  newStatus: string,
-  receiptNo: string,
-  branchName: string,
-  storeName: string,
-) {
-  return await this.prisma.$transaction(async (prisma) => {
-    try {
-      // ---------------------------
-      // Constants
-      // ---------------------------
-      const LUCKYDRAW_POINT_THRESHOLD = 1000; // accRights
-      const PROMOTION_POINT_THRESHOLD = 3000; // DailyRedemptionRight / user.rights
-      // Promotion periods in Bangkok time (inclusive)
-      const TZ = 'Asia/Bangkok';
-      const PROMOTION_PERIODS_BKK: Array<{ start: moment.Moment; end: moment.Moment }> = [
-        { start: moment.tz('2025-10-23 00:00:00', TZ), end: moment.tz('2025-10-31 23:59:59', TZ) }, //prod
-        //{ start: moment.tz('2025-10-13 00:00:00', TZ), end: moment.tz('2025-10-31 23:59:59', TZ) }, //test
-        { start: moment.tz('2025-11-25 00:00:00', TZ), end: moment.tz('2025-12-03 23:59:59', TZ) },
-      ];
-      const toBkk = (d: Date | string | number) => moment(d).tz(TZ);
-      const sameDayBkk = (a: Date, b: Date) => toBkk(a).isSame(toBkk(b), 'day');
-      const dayKeyBkk = (d: Date) => toBkk(d).format('YYYY-MM-DD'); // e.g. "2025-10-10"
-      const toPgDateFromBkk = (d: Date) => new Date(dayKeyBkk(d));  // safe for @db.Date
-      const inAnyPromotionPeriodBkk = (d: Date) => {
-        const m = toBkk(d).startOf('day');
-        return PROMOTION_PERIODS_BKK.some(({ start, end }) =>
-          m.isBetween(start, end, 'second', '[]'),
-        );
-      };
-      // ---------------------------
-      // 1) Validate Branch
-      // ---------------------------
-      const existingBranch = await prisma.branch.findFirst({ where: { branchName } });
-      if (!existingBranch) {
-        this.logger.error(`Not found branch with branchName "${branchName}": approveStatus`);
-        throw new ConflictException(`ไม่พบสาขาหมายเลข ${branchName}`);
-      }
-      // ---------------------------
-      // 2) Validate User
-      // ---------------------------
-      const user = await prisma.user.findFirst({ where: { lineId } });
-      if (!user) {
-        this.logger.error('Cant find lineId', lineId, ':approveStatus');
-        throw new NotFoundException(`ไม่พบผู้ใช้หมายเลข ${lineId}`);
-      }
-      // ---------------------------
-      // 3) Fetch group receipts
-      // ---------------------------
-      const receipts = await prisma.receipt.findMany({
-        where: { receiptNo, branchName, storeName },
-        orderBy: { uploadedAt: 'asc' },
+
+  async recalculateTopSpenderAmount(prisma: Prisma.TransactionClient, lineId: string) {
+    const approvedReceipts = await prisma.receipt.findMany({
+      where: {
+        lineId,
+        status: 'approved',
+      },
+      orderBy: { uploadedAt: 'asc' },
+    });
+
+    let totalPoints = 0;
+    let slotsUsed = 0;
+    let buTotal = 0;
+    const BU_CAP = 5000;
+    const MAX_SLOTS = 10;
+
+    const TOP_SPENDER_BLACKLIST = ['GOLD_JEWELRY', 'BEAUTY_CLINIC', 'EDUCATION', 'IT_GADGET'];
+
+    for (const r of approvedReceipts) {
+      if (slotsUsed >= MAX_SLOTS) break;
+
+      const amount = Number(r.amount);
+      const store: any = await prisma.store.findFirst({
+        where: { storeName: r.storeName, branchId: r.branchId },
       });
-      if (!receipts.length) {
-        this.logger.error(`No receipts found for receiptNo: ${receiptNo}`, 'approveStatus');
-        throw new NotFoundException(`No receipts found for receiptNo: ${receiptNo}`);
+
+      const isParticipating = store?.isParticipating !== false;
+      const category = store?.category || 'GENERAL';
+
+      // Rules: Exclude Blacklist (Gold, Beauty, Education, IT)
+      if (!isParticipating || TOP_SPENDER_BLACKLIST.includes(category)) {
+        continue;
       }
-      const targetReceipt = receipts.find((r) => r.receiptId === receiptId);
-      if (!targetReceipt) {
-        throw new NotFoundException(
-          `Receipt with ID ${receiptId} not found in the specified context.`,
-        );
+
+      if (category === 'BU') {
+        if (buTotal < BU_CAP) {
+          const contribution = Math.min(amount, BU_CAP - buTotal);
+          totalPoints += contribution;
+          buTotal += contribution;
+          slotsUsed++;
+        }
+      } else {
+        totalPoints += amount;
+        slotsUsed++;
       }
-      // ---------------------------
-      // 4) Status change: APPROVE
-      // ---------------------------
-      if (newStatus === 'approved') {
-        const previouslyApprovedReceipt = receipts.find((r) => r.status === 'approved');
-        if (previouslyApprovedReceipt && previouslyApprovedReceipt.receiptId === receiptId) {
-          this.logger.error(
-            `Cannot approve again. Receipt: ${receiptNo} already approved.`,
-            'approveStatus',
+    }
+
+    const luckyRights = Math.floor(totalPoints / 1000);
+
+    return await prisma.user.update({
+      where: { lineId },
+      data: {
+        accPoints: totalPoints,
+        accRights: luckyRights,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  async recalculateDailyEligibility(prisma: Prisma.TransactionClient, lineId: string, date: Date, branchId?: string, branchName?: string) {
+    const MOVIE_THRESHOLD = 2500;
+    const GOLD_THRESHOLD = 3500;
+    const TZ = 'Asia/Bangkok';
+
+    const receiptsToday = await prisma.receipt.findMany({
+      where: {
+        lineId,
+        uploadedAt: {
+          gte: moment(date).tz(TZ).startOf('day').toDate(),
+          lte: moment(date).tz(TZ).endOf('day').toDate(),
+        },
+        status: 'approved',
+      },
+      orderBy: { uploadedAt: 'asc' },
+      take: 3,
+    });
+
+    let totalMovie = 0;
+    let totalGold = 0;
+    const EXCLUDED_CATEGORIES_GOLD = ['BU', 'GOLD_JEWELRY', 'BEAUTY_CLINIC', 'EDUCATION', 'IT_GADGET'];
+    const EXCLUDED_CATEGORIES_MOVIE = [...EXCLUDED_CATEGORIES_GOLD, 'FOOD'];
+
+    for (const r of receiptsToday) {
+      const store: any = await prisma.store.findFirst({
+        where: { storeName: r.storeName, branchId: r.branchId },
+      });
+      const isParticipating = store?.isParticipating !== false;
+      const category = store?.category || 'GENERAL';
+
+      // Movie Total: Excludes Food + others
+      if (isParticipating && !EXCLUDED_CATEGORIES_MOVIE.includes(category)) {
+        totalMovie += Number(r.amount);
+      }
+
+      // Gold Total: Includes Food, excludes others
+      if (isParticipating && !EXCLUDED_CATEGORIES_GOLD.includes(category)) {
+        totalGold += Number(r.amount);
+      }
+    }
+
+    const dateOnlyBkkString = moment(date).tz(TZ).format('YYYY-MM-DD');
+    const dateOnlyBkk = new Date(dateOnlyBkkString);
+    const existingDaily = await prisma.dailyRedemptionRight.findFirst({
+      where: { lineId, dateEarned: dateOnlyBkk },
+    });
+
+    const eligibleMovie = totalMovie >= MOVIE_THRESHOLD;
+    const eligibleGold = totalGold >= GOLD_THRESHOLD;
+    const dailyTotal = totalGold;
+
+    // Single-Tier: Max 1 right per day if any threshold hit
+    const redeemRights = (eligibleMovie || eligibleGold) ? 1 : 0;
+
+    if (existingDaily) {
+      return await prisma.dailyRedemptionRight.update({
+        where: { id: existingDaily.id },
+        data: {
+          totalSpent: dailyTotal,
+          redeemRights,
+          eligibleMovie,
+          eligibleGoldA: eligibleGold,
+          eligibleGoldB: eligibleGold,
+          updatedAt: new Date(),
+          receiptIds: receiptsToday.map(r => r.receiptId).join(','),
+        } as any,
+      });
+    } else {
+      return await prisma.dailyRedemptionRight.create({
+        data: {
+          lineId,
+          dateEarned: dateOnlyBkk,
+          totalSpent: dailyTotal,
+          redeemRights,
+          eligibleMovie,
+          eligibleGoldA: eligibleGold,
+          eligibleGoldB: eligibleGold,
+          receiptIds: receiptsToday.map(r => r.receiptId).join(','),
+          branchId: branchId || null,
+          branchName: branchName || null,
+        } as any,
+      });
+    }
+  }
+
+  async approveStatus(
+    receiptId: number,
+    lineId: string,
+    newStatus: string,
+    receiptNo: string,
+    branchName: string,
+    storeName: string,
+  ) {
+    return await this.prisma.$transaction(async (prisma) => {
+      try {
+        const TZ = 'Asia/Bangkok';
+        const toBkk = (d: Date | string | number) => moment(d).tz(TZ);
+        const sameDayBkk = (a: Date, b: Date) => toBkk(a).isSame(toBkk(b), 'day');
+
+        // Promotion periods check
+        const PROMOTION_PERIODS_BKK = [
+          //{ start: new Date('2026-02-02T00:00:00+07:00'), end: new Date('2026-02-24T23:59:59+07:00') }, //prod
+          { start: new Date('2026-01-20T00:00:00+07:00'), end: new Date('2026-02-02T23:59:59+07:00') }, //test
+        ];
+        const inAnyPromotionPeriodBkk = (d: Date) => {
+          const m = toBkk(d).startOf('day');
+          return PROMOTION_PERIODS_BKK.some(({ start, end }) =>
+            m.isBetween(start, end, 'second', '[]'),
           );
-          throw new ConflictException(
-            `ไม่สามารถอัพเดทสถานะถูกต้องซ้ําให้กับใบเสร็จหมายเลข ${receiptNo} เนื่องจากใบเสร็จนี้ได้ถูกปรับสถานะเป็นถูกต้องไปแล้ว`,
-          );
-        }
-        // Revert prior approved in group (if any)
-        if (previouslyApprovedReceipt) {
-          const revertAmount = Number(previouslyApprovedReceipt.amount);
-          const revertAccRights = Math.floor(revertAmount / LUCKYDRAW_POINT_THRESHOLD);
-          await prisma.user.update({
-            where: { lineId: user.lineId },
-            data: {
-              accPoints: { decrement: revertAmount },
-              accRights: { decrement: revertAccRights },
-            },
-          });
-          await prisma.receipt.update({
-            where: { receiptId: previouslyApprovedReceipt.receiptId },
-            data: { status: 'duplicated', updatedAt: new Date() },
-          });
-          this.websocketGateway?.sendReceiptUpdate?.(lineId, {
-            receiptId: previouslyApprovedReceipt.receiptId,
-            status: 'duplicated',
-          });
-        }
-        // Approve target: accumulate Top Spender + Lucky Draw
-        const amount = Number(targetReceipt.amount);
-        const luckyRightsInc = Math.floor(amount / LUCKYDRAW_POINT_THRESHOLD);
-        await prisma.user.update({
-          where: { lineId: user.lineId },
-          data: {
-            accPoints: { increment: amount },
-            accRights: { increment: luckyRightsInc },
-          },
+        };
+
+        const existingBranch = await prisma.branch.findFirst({ where: { branchName } });
+        if (!existingBranch) throw new ConflictException(`ไม่พบสาขาหมายเลข ${branchName}`);
+
+        const user = await prisma.user.findFirst({ where: { lineId } });
+        if (!user) throw new NotFoundException(`ไม่พบผู้ใช้หมายเลข ${lineId}`);
+
+        const receipts = await prisma.receipt.findMany({
+          where: { receiptNo, branchName, storeName },
+          orderBy: { uploadedAt: 'asc' },
         });
-        await prisma.receipt.update({
-          where: { receiptId: targetReceipt.receiptId },
-          data: { status: 'approved', updatedAt: new Date() },
+        if (!receipts.length) throw new NotFoundException(`No receipts found for receiptNo: ${receiptNo}`);
+
+        const targetReceipt = receipts.find((r) => r.receiptId === receiptId);
+        if (!targetReceipt) throw new NotFoundException(`Receipt with ID ${receiptId} not found.`);
+
+        // 1. Lock Check: Block any status changes if the user has already redeemed for this day
+        const dateOnlyBkkString = moment(targetReceipt.receiptDate).tz(TZ).format('YYYY-MM-DD');
+        const dateOnlyBkk = new Date(dateOnlyBkkString);
+        const dailyRecord = await prisma.dailyRedemptionRight.findFirst({
+          where: { lineId, dateEarned: dateOnlyBkk },
         });
-        // Mark others as duplicated
-        for (const r of receipts) {
-          if (r.receiptId !== receiptId) {
+
+        if (dailyRecord && (dailyRecord as any).usedRights > 0 && newStatus !== 'approved') {
+          throw new ConflictException('ไม่สามารถแก้ไขสถานะใบเสร็จได้ เนื่องจากผู้ใช้ได้ใช้สิทธิ์แลกรางวัลของวันนี้ไปแล้ว');
+        }
+
+        if (newStatus === 'approved') {
+          const previouslyApprovedReceipt = receipts.find((r) => r.status === 'approved');
+          if (previouslyApprovedReceipt && previouslyApprovedReceipt.receiptId === receiptId) {
+            throw new ConflictException(`ใบเสร็จหมายเลข ${receiptNo} ได้ถูกปรับสถานะเป็นถูกต้องไปแล้ว`);
+          }
+
+          if (previouslyApprovedReceipt) {
             await prisma.receipt.update({
-              where: { receiptId: r.receiptId },
+              where: { receiptId: previouslyApprovedReceipt.receiptId },
               data: { status: 'duplicated', updatedAt: new Date() },
             });
-            this.websocketGateway?.sendReceiptUpdate?.(lineId, {
-              receiptId: r.receiptId,
-              status: 'duplicated',
-            });
           }
-        }
-        
-        // PROMOTION LOGIC - MAX 1 RIGHT PER DAY
-        const approveDate = new Date();
-        const receiptDate = new Date(targetReceipt.receiptDate);
-        const uploadedAt = new Date(targetReceipt.uploadedAt ?? targetReceipt.receiptDate);
-        const sameDayAll =
-          sameDayBkk(receiptDate, uploadedAt) &&
-          sameDayBkk(receiptDate, approveDate);
-        const promotionOk = sameDayAll && inAnyPromotionPeriodBkk(approveDate);
-        const dateOnlyBkk = toPgDateFromBkk(approveDate);
-        
-        if (promotionOk) {
-          const existingDaily = await prisma.dailyRedemptionRight.findFirst({
-            where: { lineId, dateEarned: dateOnlyBkk },
+
+          await prisma.receipt.update({
+            where: { receiptId: targetReceipt.receiptId },
+            data: { status: 'approved', updatedAt: new Date() },
           });
-          
-          const spent = amount;
-          let gainedRights = 0;
-          
-          if (existingDaily) {
-            // User already has a record for today - update totalSpent
-            const prevTotal = Number(existingDaily.totalSpent ?? 0);
-            const newTotal = prevTotal + spent;
-            
-            // Check current state
-            const usedRights = existingDaily.usedRights ?? 0;
-            const redeemRights = existingDaily.redeemRights ?? 0;
-            
-            // Logic: Only give right if both usedRights and redeemRights are 0 AND total >= 3000
-            if (usedRights === 0 && redeemRights === 0 && newTotal >= PROMOTION_POINT_THRESHOLD) {
-              gainedRights = 1;
+
+          await this.recalculateTopSpenderAmount(prisma, lineId);
+
+          for (const r of receipts) {
+            if (r.receiptId !== receiptId) {
+              await prisma.receipt.update({
+                where: { receiptId: r.receiptId },
+                data: { status: 'duplicated', updatedAt: new Date() },
+              });
+              this.websocketGateway?.sendReceiptUpdate?.(lineId, { receiptId: r.receiptId, status: 'duplicated' });
             }
-            // If usedRights = 1 OR redeemRights = 1, user already got their 1 right for today
-            
-            await prisma.dailyRedemptionRight.update({
-              where: { id: existingDaily.id },
-              data: {
-                totalSpent: newTotal,
-                ...(gainedRights > 0 && { redeemRights: 1 }),
-                updatedAt: new Date(),
-                receiptIds: existingDaily.receiptIds
-                  ? `${existingDaily.receiptIds},${targetReceipt.receiptId}`
-                  : `${targetReceipt.receiptId}`,
-                branchId: existingBranch.branchId ?? existingDaily.branchId,
-                branchName: existingBranch.branchName ?? existingDaily.branchName,
-              },
-            });
-          } else {
-            // First receipt of the day - create new record
-            const qualifiesForRight = spent >= PROMOTION_POINT_THRESHOLD;
-            const rights = qualifiesForRight ? 1 : 0;
-            gainedRights = rights;
-            
-            await prisma.dailyRedemptionRight.create({
-              data: {
-                lineId,
-                dateEarned: dateOnlyBkk,
-                totalSpent: spent,
-                redeemRights: rights,
-                usedRights: 0,
-                isExpired: false,
-                receiptIds: `${targetReceipt.receiptId}`,
-                branchId: existingBranch.branchId,
-                branchName: existingBranch.branchName,
-              },
-            });
           }
-          
-          // Update user's total rights if they gained any
-          if (gainedRights > 0) {
+
+          const now = new Date();
+          const pOk = sameDayBkk(new Date(targetReceipt.receiptDate), now) && inAnyPromotionPeriodBkk(now);
+          if (pOk) {
+            await this.recalculateDailyEligibility(prisma, lineId, now, existingBranch.branchId, existingBranch.branchName);
+          }
+
+          // Update branch frequency
+          const branchRes = await prisma.receipt.groupBy({
+            by: ['branchId', 'branchName', 'updatedAt'],
+            where: { lineId, status: 'approved' },
+            _count: { branchId: true },
+            orderBy: { updatedAt: 'desc' },
+            take: 1,
+          });
+          if (branchRes.length > 0) {
             await prisma.user.update({
               where: { lineId },
-              data: { rights: { increment: gainedRights } },
-            });
-          }
-        }
-        
-        // Most-branch info + WS updates
-        const result = await prisma.receipt.groupBy({
-          by: ['branchId', 'branchName', 'updatedAt'],
-          where: { lineId, status: 'approved' },
-          _count: { branchId: true },
-          orderBy: { updatedAt: 'desc' },
-          take: 1,
-        });
-        const mostFrequentBranchId = result.length > 0 ? (result[0] as any).branchId : null;
-        const mostFrequentBranchName = result.length > 0 ? (result[0] as any).branchName : null;
-        await prisma.user.update({
-          where: { lineId },
-          data: {
-            mostBranchId: mostFrequentBranchId,
-            mostBranchName: mostFrequentBranchName,
-            updatedAt: new Date(),
-          },
-        });
-        const updatedUser = await prisma.user.findFirst({ where: { lineId } });
-        this.websocketGateway?.sendUserInfoUpdate?.(lineId, {
-          user: updatedUser,
-          message: 'User points updated after receipt approval',
-        });
-        this.websocketGateway?.sendReceiptUpdate?.(lineId, {
-          receiptId: targetReceipt.receiptId,
-          status: 'approved',
-        });
-        return {
-          message: `อัพเดทสถานะใบเสร็จหมายเลข ${receiptNo} ให้เป็นสถานะ ${newStatus} เรียบร้อยแล้ว`,
-          case: 'approved',
-        };
-      }
-      // ---------------------------
-      // 7) Change to non-approved when it was not approved already
-      // ---------------------------
-      if (targetReceipt.status !== 'approved') {
-        await prisma.receipt.update({
-          where: { receiptId: targetReceipt.receiptId },
-          data: { status: newStatus, updatedAt: new Date() },
-        });
-        this.websocketGateway?.sendReceiptUpdate?.(lineId, {
-          receiptId: targetReceipt.receiptId,
-          status: newStatus,
-        });
-        return {
-          message: `อัพเดทสถานะใบเสร็จหมายเลข ${receiptNo} ให้เป็นสถานะ ${newStatus} เรียบร้อยแล้ว`,
-          case: 'non-approved change only',
-        };
-      }
-      // ---------------------------
-      // 8) Revert FROM approved → other
-      // ---------------------------
-      const revertAmount = Number(targetReceipt.amount);
-      const revertAccRights = Math.floor(revertAmount / LUCKYDRAW_POINT_THRESHOLD);
-      // 8.1 Subtract accumulative totals & lucky-draw rights
-      await prisma.user.update({
-        where: { lineId: user.lineId },
-        data: {
-          accPoints: { decrement: revertAmount },
-          accRights: { decrement: revertAccRights },
-        },
-      });
-      // 8.2 Change receipt status
-      await prisma.receipt.update({
-        where: { receiptId: targetReceipt.receiptId },
-        data: { status: newStatus, updatedAt: new Date() },
-      });
-      
-      // 8.3 Rollback DAILY promo rights if applicable
-      const receiptBkkDay = toPgDateFromBkk(new Date(targetReceipt.receiptDate));
-      if (inAnyPromotionPeriodBkk(new Date(targetReceipt.receiptDate))) {
-        const daily = await prisma.dailyRedemptionRight.findFirst({
-          where: { lineId, dateEarned: receiptBkkDay },
-        });
-        
-        if (daily) {
-          const prevTotal = Number(daily.totalSpent ?? 0);
-          const newTotalRaw = prevTotal - revertAmount;
-          const newTotal = newTotalRaw > 0 ? newTotalRaw : 0;
-          
-          // Check if user loses their right qualification
-          const hadQualifyingAmount = prevTotal >= PROMOTION_POINT_THRESHOLD;
-          const stillQualifies = newTotal >= PROMOTION_POINT_THRESHOLD;
-          
-          // If losing qualification and already used the right, can't revert
-          if (hadQualifyingAmount && !stillQualifies && daily.usedRights > 0) {
-            throw new ConflictException(
-              'ไม่สามารถเปลี่ยนสถานะได้ เนื่องจากสิทธิ์พิเศษของวันนั้นถูกใช้งานแล้ว',
-            );
-          }
-          
-          // Update rights if losing qualification
-          let newRedeemRights = daily.redeemRights ?? 0;
-          let rightsDelta = 0;
-          
-          if (hadQualifyingAmount && !stillQualifies) {
-            // Losing the right
-            rightsDelta = -(daily.redeemRights ?? 0);
-            newRedeemRights = 0;
-          }
-          
-          // Remove receiptId from list
-          let newReceiptIds = daily.receiptIds || '';
-          if (newReceiptIds) {
-            const parts = newReceiptIds.split(',').map((s) => s.trim()).filter(Boolean);
-            const filtered = parts.filter((pid) => pid !== String(targetReceipt.receiptId));
-            newReceiptIds = filtered.join(',');
-          }
-          
-          // Update or delete the daily row
-          if (newTotal === 0 && daily.usedRights === 0 && !newReceiptIds) {
-            await prisma.dailyRedemptionRight.delete({ where: { id: daily.id } });
-          } else {
-            await prisma.dailyRedemptionRight.update({
-              where: { id: daily.id },
               data: {
-                totalSpent: newTotal,
-                redeemRights: newRedeemRights,
-                receiptIds: newReceiptIds || null,
+                mostBranchId: (branchRes[0] as any).branchId,
+                mostBranchName: (branchRes[0] as any).branchName,
                 updatedAt: new Date(),
               },
             });
           }
-          
-          // Update user rights if removed
-          if (rightsDelta < 0) {
-            await prisma.user.update({
-              where: { lineId },
-              data: { rights: { decrement: Math.abs(rightsDelta) } },
-            });
-          }
+
+          const updatedUser = await prisma.user.findFirst({ where: { lineId } });
+          this.websocketGateway?.sendUserInfoUpdate?.(lineId, { user: updatedUser, message: 'Updated' });
+          this.websocketGateway?.sendReceiptUpdate?.(lineId, { receiptId: targetReceipt.receiptId, status: 'approved' });
+
+          return { message: 'Approved successfully', case: 'approved' };
+        } else {
+          // Revert or Change status
+          await prisma.receipt.update({
+            where: { receiptId: targetReceipt.receiptId },
+            data: { status: newStatus, updatedAt: new Date() },
+          });
+
+          await this.recalculateTopSpenderAmount(prisma, lineId);
+          await this.recalculateDailyEligibility(prisma, lineId, new Date(targetReceipt.receiptDate));
+
+          const updatedUser = await prisma.user.findFirst({ where: { lineId } });
+          this.websocketGateway?.sendUserInfoUpdate?.(lineId, { user: updatedUser, message: 'Updated' });
+          this.websocketGateway?.sendReceiptUpdate?.(lineId, { receiptId: targetReceipt.receiptId, status: newStatus });
+
+          return { message: 'Updated successfully', case: 'updated' };
         }
+      } catch (error: any) {
+        this.logger.error(`Fail to update status: ${error.message}`);
+        throw new BadRequestException(error.message);
       }
-      
-      const updatedUserAfterRevert = await prisma.user.findFirst({ where: { lineId } });
-      this.websocketGateway?.sendUserInfoUpdate?.(lineId, {
-        user: updatedUserAfterRevert,
-        message: 'User points updated after receipt revert',
-      });
-      this.websocketGateway?.sendReceiptUpdate?.(lineId, {
-        receiptId: targetReceipt.receiptId,
-        status: newStatus,
-      });
-      return {
-        message: `อัพเดทสถานะใบเสร็จหมายเลข ${receiptNo} ให้เป็นสถานะ ${newStatus} เรียบร้อยแล้ว`,
-        case: 'revert from approved (with daily rollback if applicable)',
-      };
-    } catch (error: any) {
-      this.logger.error(`Fail to update status  ${error.message} :approveStatus`);
-      throw new BadRequestException(`${error.message}`);
-    }
-  });
-}
+    });
+  }
 
 
   async getBranchAdmin(query: { pageSize?: number; cursor?: string }) {
@@ -813,7 +734,7 @@ export class AdminService {
     }
   }
 
-  
+
   async getCustomers(query: {
     startDate?: string;
     endDate?: string;
@@ -862,12 +783,12 @@ export class AdminService {
         // 1. Get ALL matching users (no limit)
         // 2. Sort them manually by accPoints
         // 3. Apply pagination ourselves
-        
+
         // Get ALL users that match the filters (removed take limit)
         const allMatchingUsers = await this.prisma.user.findMany({
           where: filters,
         });
-        
+
         // Sort users by accPoints (numeric sort, descending)
         const sortedUsers = allMatchingUsers.sort((a, b) => {
           // Parse accPoints values as numbers for proper numeric sorting
@@ -875,11 +796,11 @@ export class AdminService {
           const bPoints = b.accPoints ? parseInt(b.accPoints.toString(), 10) : 0;
           return bPoints - aPoints; // Descending order (highest first)
         });
-        
+
         // Apply pagination manually
         const pageSize = query.pageSize || 10;
         let startIndex = 0;
-        
+
         // Handle cursor-based pagination
         if (query.cursor && query.cursor !== '0') {
           const cursorIndex = sortedUsers.findIndex(user => user.lineId === query.cursor);
@@ -887,9 +808,9 @@ export class AdminService {
             startIndex = cursorIndex + 1; // Start after the cursor item
           }
         }
-        
+
         const paginatedUsers = sortedUsers.slice(startIndex, startIndex + pageSize);
-        
+
         // If no users after pagination
         if (!paginatedUsers.length) {
           return {
@@ -899,13 +820,13 @@ export class AdminService {
             pageSize
           };
         }
-        
+
         // Calculate next cursor
         const hasMoreData = startIndex + pageSize < sortedUsers.length;
         const nextCursor = hasMoreData
           ? paginatedUsers[paginatedUsers.length - 1].lineId
           : null;
-        
+
         // Return the paginated and sorted result
         return {
           message: 'customers fetched successfully',
@@ -915,14 +836,14 @@ export class AdminService {
           pageSize
         };
       }
-      
+
       // For non-Top Spender sorts, use regular Prisma sorting
-      
+
       // 7) Default sort is createdAt desc
       let orderClause: Prisma.UserOrderByWithRelationInput = {
         createdAt: 'desc',
       };
-      
+
       // 8) Regular Prisma query with pagination
       const customers = await this.prisma.user.findMany({
         take: query.pageSize || 10,
@@ -1157,7 +1078,7 @@ export class AdminService {
             redeemId,
             gotRedeemded:
               branchStock.gotRedeemded !== undefined &&
-              branchStock.gotRedeemded !== null
+                branchStock.gotRedeemded !== null
                 ? branchStock.gotRedeemded
                 : 0,
           },
@@ -1188,7 +1109,7 @@ export class AdminService {
           redeemId: stock.redeemId,
           sumgotRedeemded:
             stock._sum.gotRedeemded !== undefined &&
-            stock._sum.gotRedeemded !== null
+              stock._sum.gotRedeemded !== null
               ? stock._sum.gotRedeemded
               : 0,
         }));
@@ -1289,15 +1210,15 @@ export class AdminService {
       const formattedReceipt = receipts.map((receipt) => {
         const uploadedAt = receipt.uploadedAt
           ? new Date(receipt.uploadedAt).toLocaleString('th-TH', {
-              timeZone: 'Asia/Bangkok',
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: false,
-            })
+            timeZone: 'Asia/Bangkok',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+          })
           : null;
 
         return {
@@ -1394,7 +1315,7 @@ export class AdminService {
 
       // 7) Sort customers based on orderBy parameter
       let sortedCustomers = customers;
-      
+
       if (query.orderBy === 'allPoints') {
         // Top Spender sort - sort by accPoints (numeric sort, descending)
         sortedCustomers = customers.sort((a, b) => {
@@ -1423,17 +1344,17 @@ export class AdminService {
         const formatDateTime = (date: Date | null) => {
           return date
             ? new Date(date)
-                .toLocaleString('th-TH', {
-                  timeZone: 'Asia/Bangkok',
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                  hour12: false,
-                })
-                .replace(/\//g, '-')
+              .toLocaleString('th-TH', {
+                timeZone: 'Asia/Bangkok',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+              })
+              .replace(/\//g, '-')
             : '';
         };
 
@@ -1531,7 +1452,7 @@ export class AdminService {
 
       // Sort customers if orderBy is specified
       let sortedCustomers = customers;
-      
+
       if (query.orderBy === 'allPoints') {
         // Top Spender sort - sort by accPoints (numeric sort, descending)
         sortedCustomers = customers.sort((a, b) => {
@@ -1564,17 +1485,17 @@ export class AdminService {
           const formatDateTime = (date: Date | null | undefined) =>
             date
               ? new Date(date)
-                  .toLocaleString('th-TH', {
-                    timeZone: 'Asia/Bangkok',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false,
-                  })
-                  .replace(/\//g, '-')
+                .toLocaleString('th-TH', {
+                  timeZone: 'Asia/Bangkok',
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: false,
+                })
+                .replace(/\//g, '-')
               : '';
 
           return Array.from({ length: customer.accRights }, (_, index) => ({
@@ -1672,17 +1593,17 @@ export class AdminService {
         const formatDateTime = (date) =>
           date
             ? new Date(date)
-                .toLocaleString('th-TH', {
-                  timeZone: 'Asia/Bangkok',
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                  hour12: false,
-                })
-                .replace(/\//g, '-')
+              .toLocaleString('th-TH', {
+                timeZone: 'Asia/Bangkok',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+              })
+              .replace(/\//g, '-')
             : '';
 
         // Map redeemId to product name

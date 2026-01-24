@@ -32,7 +32,7 @@ const TermsRedeem = () => {
       {/* Header image container */}
       <div className="w-full bg-white md:w-96 flex items-center justify-center">
         <img
-          src="banner_major.webp"
+          src="//banner_major.webp"
           alt="header1page"
           className="w-full object-contain"
         />

@@ -28,7 +28,7 @@ interface ApiResponse {
 }
 
 const RedeemHistoryPage = () => {
-  
+
   const { accessToken } = useAuthStore();
 
   // We store the claimed histories
@@ -47,7 +47,7 @@ const RedeemHistoryPage = () => {
         });
 
         // The response structure has "ClaimedHistoryList" and "nextCursor"
-        setClaimedHistory(response.data.ClaimedHistoryList?? []);
+        setClaimedHistory(response.data.ClaimedHistoryList ?? []);
         setLastCursor(response.data.nextCursor);
 
         // If nextCursor is null, no more data
@@ -96,7 +96,7 @@ const RedeemHistoryPage = () => {
     <div className="font-kanit bg-wite w-full min-h-screen flex flex-col justify-start items-center bg-[var(--bg)] relative">
       {/* Header */}
       <div className="w-full min-h-[400px] bg-white md:w-96 relative">
-        <img src="banner_major.webp" alt="header1page" className="w-full" />
+        <img src="//banner_major.webp" alt="header1page" className="w-full" />
       </div>
 
       <div className="flex flex-col justify-start items-center w-[90%] md:w-96 min-h-screen text-center gap-5 px-3 py-5">
@@ -127,7 +127,10 @@ const RedeemHistoryPage = () => {
                         {history.date || "N/A"}
                       </td>
                       <td className="p-3">
-                        {history.redeemId === "redeem001" ? "แลกรับ Movie Ticket" : "แลกรับ Gift Voucher"}
+                        {history.redeemId === "redeem001" ? "แลกรับ Movie Ticket" :
+                          history.redeemId === "redeem003" ? "ส่วนลดค่ากำเหน็จ 40%" :
+                            history.redeemId === "redeem004" ? "ส่วนลดค่ากำเหน็จ 500.-" :
+                              history.redeemId === "GOLD_BOTH" ? "ทองทั้ง 2 รูปแบบ" : "แลกรับของสมนาคุณ"}
                       </td>
                       <td className="p-3">
                         {history.claimedAmount}
@@ -149,14 +152,14 @@ const RedeemHistoryPage = () => {
 
         {/* Back button - updated to match other pages */}
         <div className="flex flex-col gap-4 w-full mt-6">
-          <Link 
+          <Link
             to="/menu"
             className="w-full inline-flex justify-center items-center rounded-md bg-white py-2 px-10 text-sm text-[var(--button)] border border-[var(--button)] shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-100 transition-colors text-center"
           >
             กลับสู่หน้าหลัก
           </Link>
         </div>
-        
+
         {/* Bottom space */}
         <div className="w-full h-32 md:w-96 relative">
           {/* Bottom space */}

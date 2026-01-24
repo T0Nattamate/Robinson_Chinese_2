@@ -59,56 +59,56 @@ const TopspenderPage = () => {
   return (
     <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative">
       <div className="w-full h-full min-h-[400px] bg-white md:w-96">
-        <img src="banner_major.webp" alt="header1page" className="w-full" />
+        <img src="//banner_major.webp" alt="header1page" className="w-full" />
       </div>
       <h1 className="text-3xl pt-5 pb-5 relative text-[var(--text)]">Top Spender Ranking</h1>
-      
+
       {/* Table - Removed borders from rows and cells */}
       <div className="w-[90%] max-w-lg bg-white rounded-xl overflow-hidden">
-      {topspender.length > 0 ? (
-        <>
-        <table className="w-full border-collapse text-xs">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="p-2 text-center w-5">Rank</th>
-              <th className="p-2 text-center w-60">Name Surname</th>
-              <th className="p-2 text-center w-40">Amount</th>
-              <th className="p-2 text-center w-[15rem]">Mobile No.</th>
-              <th className="p-2 text-center">โรบินไลฟ์สไตล์ สาขา</th>
-            </tr> 
-          </thead>
-          <tbody>
-            {topspender.map((spender, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                <td className="p-2 text-center">{index + 1}.</td>   
-                <td className="p-2 text-center">{censorString(spender.fullname)}</td>
-                <td className="p-2 text-center">{formatAmount(spender.accPoints)}</td>
-                <td className="p-2 text-center">{censorString(spender.phone)}</td>
-                <td className="p-2 text-center">{spender.mostFrequentBranch}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        </>
-          ) : (
-            <div className="my-3 text-black h-32 flex justify-center items-center">
-              ยังไม่มีรายชื่อ Top Spender
-            </div>
-          )}
+        {topspender.length > 0 ? (
+          <>
+            <table className="w-full border-collapse text-xs">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="p-2 text-center w-5">Rank</th>
+                  <th className="p-2 text-center w-60">Name Surname</th>
+                  <th className="p-2 text-center w-40">Amount</th>
+                  <th className="p-2 text-center w-[15rem]">Mobile No.</th>
+                  <th className="p-2 text-center">โรบินไลฟ์สไตล์ สาขา</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topspender.map((spender, index) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="p-2 text-center">{index + 1}.</td>
+                    <td className="p-2 text-center">{censorString(spender.fullname)}</td>
+                    <td className="p-2 text-center">{formatAmount(spender.accPoints)}</td>
+                    <td className="p-2 text-center">{censorString(spender.phone)}</td>
+                    <td className="p-2 text-center">{spender.mostFrequentBranch}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        ) : (
+          <div className="my-3 text-black h-32 flex justify-center items-center">
+            ยังไม่มีรายชื่อ Top Spender
+          </div>
+        )}
       </div>
 
-      
+
 
       {/* Back Button - Updated to match other pages */}
       <div className="flex flex-col gap-4 w-[90%] max-w-md mt-6 mb-10">
         {/* Terms Button */}
-        <button 
+        <button
           className="mt-4 bg-[var(--button)] text-white px-4 py-2 rounded-sm text-sm"
           onClick={() => setIsTermsOpen(true)} // Add onClick handler
         >
           เงื่อนไข Top Spender
         </button>
-        <Link 
+        <Link
           to="/menu"
           className="w-full inline-flex justify-center items-center rounded-md bg-white py-2 px-10 text-sm text-[var(--button)] border border-[var(--button)] shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-100 transition-colors text-center"
         >
@@ -124,7 +124,7 @@ const TopspenderPage = () => {
         handleTermsDialogClose={() => setIsTermsOpen(false)}
       />
     </div>
-    
+
   );
 };
 

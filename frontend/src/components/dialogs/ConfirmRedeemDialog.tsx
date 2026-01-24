@@ -1,4 +1,4 @@
-import { Dialog, DialogPanel} from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import { animated, useTransition, useSpring } from "@react-spring/web";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,9 +19,8 @@ const ConfirmRedeemDialog: React.FC<RulesDialogProps> = ({
   const { branchId } = useParams<{ branchId: string }>();
   const {
     selectedRedeemId: redeemId,
-    selectedAnpaoName: anpaoName,
-    confirmRedeem,
-    userId,
+    selectedRewardName: rewardName,
+    confirmRedeemReward,
     setUploadCurrentBranch
   } = useUserStore();
 
@@ -47,7 +46,7 @@ const ConfirmRedeemDialog: React.FC<RulesDialogProps> = ({
   useEffect(() => {
     if (isConfirmRedeemOpen) {
       setIsVisible(true);
-  
+
       // Resolve branch name dynamically
       if (branchId) {
         const resolvedBranchName = findBranchNameByBranchId(branchId);
@@ -66,52 +65,52 @@ const ConfirmRedeemDialog: React.FC<RulesDialogProps> = ({
 
   //confirm button logic
   const handleConfirmRedeemSuccess = async () => {
-  if (!userId || !redeemId || !branchId || !anpaoName) {
-    console.error("One or more required parameters are missing.");
-    return;
-  }
+    if (!redeemId || !branchId || !rewardName) {
+      console.error("One or more required parameters are missing.");
+      return;
+    }
 
-  try {
-    const result = await confirmRedeem(userId, redeemId, branchId);
-    if (result) {
-      const branchName = findBranchNameByBranchId(branchId);
-      if (branchName) {
-        setUploadCurrentBranch(branchName);
-        setDisplayBranch(branchName); // Update displayBranch to resolved branch name
-        //console.log("Branch name resolved:", branchName);
+    try {
+      const result = await confirmRedeemReward(branchId, redeemId);
+      if (result) {
+        const branchName = findBranchNameByBranchId(branchId);
+        if (branchName) {
+          setUploadCurrentBranch(branchName);
+          setDisplayBranch(branchName); // Update displayBranch to resolved branch name
+          //console.log("Branch name resolved:", branchName);
+        } else {
+          console.error("Branch name not found for branchId:", branchId);
+          setDisplayBranch("ไม่พบข้อมูลสาขา");
+        }
+        navigate("/success-redeem");
+        handleConfirmRedeemClose();
       } else {
-        console.error("Branch name not found for branchId:", branchId);
-        setDisplayBranch("ไม่พบข้อมูลสาขา");
+        console.error("Redeem failed or undefined result");
       }
-      navigate("/success-redeem");
-      handleConfirmRedeemClose();
-    } else {
-      console.error("Redeem failed or undefined result");
-    }
-  } catch (error) {
-    let errorMessage = "An unknown error occurred.";
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    } else if (
-      typeof error === "object" &&
-      error !== null &&
-      "message" in error
-    ) {
-      errorMessage = (error as { message: string }).message;
-    }
+    } catch (error) {
+      let errorMessage = "An unknown error occurred.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error
+      ) {
+        errorMessage = (error as { message: string }).message;
+      }
 
-    Swal.fire({
-      icon: "error",
-      text: errorMessage,
-      confirmButtonText: "ยืนยัน",
-      customClass: {
-        htmlContainer: "font-kanit",
-        confirmButton: "bg-gray-700 text-white rounded-md font-kanit",
-      },
-    });
-    console.error("Error handling redeem:", error);
-  }
-};
+      Swal.fire({
+        icon: "error",
+        text: errorMessage,
+        confirmButtonText: "ยืนยัน",
+        customClass: {
+          htmlContainer: "font-kanit",
+          confirmButton: "bg-gray-700 text-white rounded-md font-kanit",
+        },
+      });
+      console.error("Error handling redeem:", error);
+    }
+  };
 
   return (
     <Dialog
@@ -129,7 +128,7 @@ const ConfirmRedeemDialog: React.FC<RulesDialogProps> = ({
               item && (
                 <animated.div style={{ ...styles, ...springProps }}>
                   <DialogPanel className="w-full text-center p-6 max-w-md rounded-xl bg-white drop-shadow-lg">
-                  
+
                     <section className="mt-5 ">
                       {/* {rewardId && (
                         <p className="text-green-700 text-sm font-light">
@@ -137,10 +136,10 @@ const ConfirmRedeemDialog: React.FC<RulesDialogProps> = ({
                         </p>
                       )} */}
 
-                        <p className="mt-5  font-kanit">
-                          คุณยืนยันแลกรับอั่งเปา ณ โรบินสัน <br></br>
-                          ไลฟ์สไตล์ {displayBranch} หรือไม่ 
-                        </p>
+                      <p className="mt-5  font-kanit">
+                        คุณยืนยันแลกรับรางวัล ณ โรบินสัน <br></br>
+                        ไลฟ์สไตล์ {displayBranch} หรือไม่
+                      </p>
                     </section>
 
                     <div className="mt-8">

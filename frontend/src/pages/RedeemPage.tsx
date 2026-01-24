@@ -20,7 +20,6 @@ interface BranchStock {
 const RedeemPage = () => {
   const navigate = useNavigate();
   const { accessToken } = useAuthStore();
-  const { lineId, fetchUserRights, rights } = useUserStore();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isConfirming, setIsConfirming] = useState(false);
 
@@ -31,109 +30,72 @@ const RedeemPage = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [stockItem, setStockItem] = useState<BranchStock | null>(null);
 
-  // Check current day of week
-  const [isWeekday, setIsWeekday] = useState<boolean>(true);
-  // const [redeemType, setRedeemType] = useState<{
-  //   name: string;
-  //   image: string;
-  //   redeemId: string;
-  //   claimedAmount: number;
-  //   deductionText: string;
-  // }>({
-  //   name: "บัตรชมภาพยนตร์",
-  //   image: "/movie_ticket.png",
-  //   redeemId: "redeem001",
-  //   claimedAmount: 1,
-  //   deductionText: "1 สิทธิ์"
-  // });
+  // Selection state
+  type RewardCategory = 'MOVIE' | 'GOLD' | null;
+  type GoldType = 'redeem003' | 'redeem004' | 'GOLD_BOTH';
 
-  // better initial redeemtype default value Calculate initial state immediately
-  const getInitialRedeemType = () => {
-    const today = new Date().getDay();
-    const isWeekdayCheck = today >= 1 && today <= 5;
-    
-    if (isWeekdayCheck) {
-      // Phase 2 weekday: Gift Voucher
-      return {
-        name: "บัตรกำนัลเงินสด",
-        image: "/Gift Voucher.png",
-        redeemId: "redeem002",
-        claimedAmount: 1,
-        deductionText: "1 สิทธิ์"
-      };
-    } else {
-      // Phase 2 weekend: Movie Ticket
-      return {
-        name: "บัตรชมภาพยนตร์",
-        image: "/ตั๋ว 2 ใบ.png",
-        redeemId: "redeem001",
-        claimedAmount: 1,
-        deductionText: "1 สิทธิ์"
-      };
-    }
-  };
+  const [selectedCategory, setSelectedCategory] = useState<RewardCategory>(null);
+  const [selectedGoldType, setSelectedGoldType] = useState<GoldType>('redeem003');
 
-  const [redeemType, setRedeemType] = useState(getInitialRedeemType());
-  const combinedBranchId = "R-" + branchCode.trim();
-
-  // Determine day of week on mount
-  useEffect(() => {
-    //const today = 6;
-    const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    const isWeekdayCheck = today >= 1 && today <= 5; // Monday to Friday
-    setIsWeekday(isWeekdayCheck);
-
-    if (isWeekdayCheck) {
-      // Phase 1 Weekday: Movie Ticket
-      // setRedeemType({
-      //   name: "บัตรชมภาพยนตร์",
-      //   image: "/ตั๋ว 2 ใบ.png",
-      //   redeemId: "redeem001",
-      //   claimedAmount: 1,
-      //   deductionText: "1 สิทธิ์"
-      // });
-
-      //Phase 2 weekday: Gift Voucher
-      setRedeemType({
-        name: "บัตรกำนัลเงินสด",
-        image: "/Gift Voucher.png",
-        redeemId: "redeem002",
-        claimedAmount: 1,
-        deductionText: "1 สิทธิ์"
-      });
-    } else {
-      // Phase 1 Weekend: Money/Gift Voucher
-      // setRedeemType({
-      //   name: "บัตรกำนัลเงินสด",
-      //   image: "/Gift Voucher.png",
-      //   redeemId: "redeem002",
-      //   claimedAmount: 1,
-      //   deductionText: "1 สิทธิ์"
-      // });
-
-      // Phase 2 weekend: Movie Ticket
-      setRedeemType({
-        name: "บัตรชมภาพยนตร์",
-        image: "/ตั๋ว 2 ใบ.png",
-        redeemId: "redeem001",
-        claimedAmount: 1,
-        deductionText: "1 สิทธิ์"
-      });
-    }
-  }, []);
+  const {
+    eligibleMovie,
+    eligibleGoldA,
+    eligibleGoldB,
+    fetchUserRights,
+    rights,
+    usedMovie,
+    usedGold
+  } = useUserStore();
 
   useEffect(() => {
-    const fetchDataRedeem = async () => {
-      try {
-        await fetchUserRights();
-      } catch (error) {
-        console.error("Error fetching user rights:", error);
-      }
-    };
-    fetchDataRedeem();
+    fetchUserRights();
   }, [fetchUserRights]);
 
+  // Map category and type to current reward display info
+  const getRewardInfo = () => {
+    if (selectedCategory === 'MOVIE') {
+      return {
+        name: "บัตรชมภาพยนตร์",
+        image: "/ตั๋ว 2 ใบ.png",
+        redeemId: "redeem001",
+        deductionText: "1 สิทธิ์"
+      };
+    } else if (selectedCategory === 'GOLD') {
+      if (selectedGoldType === 'redeem003') {
+        return {
+          name: "ส่วนลดค่ากำเหน็จ 40%",
+          image: "/Gift Voucher.png",
+          redeemId: "redeem003",
+          deductionText: "1 สิทธิ์"
+        };
+      } else if (selectedGoldType === 'redeem004') {
+        return {
+          name: "ส่วนลดค่ากำเหน็จ 500.-",
+          image: "/Gift Voucher.png",
+          redeemId: "redeem004",
+          deductionText: "1 สิทธิ์"
+        };
+      } else {
+        return {
+          name: "ทองทั้ง 2 รูปแบบ",
+          image: "/Gift Voucher.png",
+          redeemId: "GOLD_BOTH",
+          deductionText: "1 สิทธิ์รวม"
+        };
+      }
+    }
+    return null;
+  };
+
+  const currentReward = getRewardInfo();
+  const combinedBranchId = "R-" + branchCode.trim();
+
   const handleRedeemClick = async () => {
+    if (!currentReward) {
+      setErrorMessage("กรุณาเลือกของรางวัล");
+      return;
+    }
+
     if (!branchCode) {
       setErrorMessage("กรุณากรอกรหัสสาขา");
       return;
@@ -148,61 +110,57 @@ const RedeemPage = () => {
     setErrorMessage("");
 
     try {
-      console.log("accessToken:", accessToken);
-      // Send redeemId as query parameter to get specific stock
+      setIsLoading(true);
       const response = await axiosInterceptor.get(
-        `/branch/stock/${combinedBranchId}/${redeemType.redeemId}`,
+        `/reward/available/${combinedBranchId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         }
       );
-      const data: BranchStock = response.data;
 
-      if (!data) {
-        setErrorMessage(`ไม่พบข้อมูลสต็อก${redeemType.name}สำหรับสาขานี้`);
+      const rewards: any[] = response.data;
+      const targetRedeemId = currentReward.redeemId === 'GOLD_BOTH' ? 'redeem003' : currentReward.redeemId;
+      const stockItemFound = rewards.find(r => r.redeemId === targetRedeemId);
+
+      if (!stockItemFound || stockItemFound.remainStock <= 0) {
+        setErrorMessage(`ขออภัย ของรางวัลนี้ในสต็อกหมดแล้วค่ะ`);
+        setIsLoading(false);
         return;
       }
 
-      // Check if enabled (backend also checks this, but double-check on frontend)
-      if (data.isEnable === false) {
-        setErrorMessage("ขออภัย สต็อกของรางวัลไม่เปิดให้บริการในขณะนี้");
+      if (!stockItemFound.isEnable) {
+        setErrorMessage("ขออภัย ของรางวัลไม่เปิดให้บริการในขณะนี้");
+        setIsLoading(false);
         return;
       }
 
-      const remainStock = data.amount;
-      if (remainStock <= 0) {
-        setErrorMessage("ขออภัย ไม่พบสินค้าในสต็อกค่ะ");
-        return;
-      }
-
-      setStockItem(data);
+      setStockItem({
+        ...stockItemFound,
+        amount: stockItemFound.remainStock
+      });
+      setIsLoading(false);
       setShowConfirmDialog(true);
     } catch (error) {
       console.error("Error fetching branch item:", error);
       setErrorMessage("เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์แลกรับ");
+      setIsLoading(false);
     }
   };
 
   const confirmRedeem = async () => {
-    if (isConfirming) return;
+    if (isConfirming || !currentReward) return;
     try {
       setIsConfirming(true);
       setIsLoading(true);
-      const combinedBranchId = "R-" + branchCode.trim();
-      console.log(combinedBranchId);
 
-      const requestBody = {
-        branchId: combinedBranchId,
-        lineId: lineId,
-        redeemId: redeemType.redeemId,
-        claimedAmount: redeemType.claimedAmount
-      };
-
-      const response = await axiosInterceptor.post(
-        `/user/claimed?redeemId=${stockItem?.redeemId}`,
-        requestBody,
+      await axiosInterceptor.post(
+        `/reward/redeem`,
+        {
+          branchId: combinedBranchId,
+          redeemId: currentReward.redeemId,
+        },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`
@@ -210,17 +168,16 @@ const RedeemPage = () => {
         }
       );
 
-      console.log("Claim success:", response.data);
       setIsLoading(false);
       navigate(`/success-redeem/${combinedBranchId}`);
 
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false);
       setIsConfirming(false);
-      console.error("Error claiming:", error);
+      const msg = error?.response?.data?.message || "แลกรับไม่สำเร็จ";
       Swal.fire({
         icon: "error",
-        text: "แลกรับไม่สำเร็จ สิทธิ์แลกรับไม่เพียงพอ",
+        text: msg,
         confirmButtonText: "ยืนยัน",
       });
     }
@@ -231,152 +188,210 @@ const RedeemPage = () => {
   };
 
   return (
-    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative">
+    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative pb-10">
       {isLoading && <LoadingOverlay />}
-      <div className="w-full h-full min-h-[400px] bg-white md:w-96">
+      <div className="w-full bg-white md:w-96">
         <img src="Poster black friday  50x70cm_SF.jpg" alt="header1page" className="w-full" />
       </div>
-      <div className="flex flex-col justify-center items-center w-[90%] md:w-96 md:h-full mt-5 text-center gap-5 py-5 mb-10">
-        <h1 className="text-2xl relative text-[var(--text)]">
+
+      <div className="flex flex-col justify-start items-center w-[90%] md:w-96 mt-8 text-center gap-6">
+        <h1 className="text-3xl text-white font-medium">
           แลกรับของสมนาคุณ
         </h1>
-        
-        {/* phase 1
-        <p className="mt-2 text-xl text-[var(--text)]">
-          {isWeekday 
-            ? "แลกรับบัตรชมภาพยนตร์ (จันทร์-ศุกร์)" 
-            : "แลกรับบัตรกำนัลเงินสด (เสาร์-อาทิตย์)"}
-        </p> */}
 
-        {/* phase 2 */}
-        <p className="mt-2 text-xl text-[var(--text)]">
-          {isWeekday 
-            ? "แลกรับบัตรกำนัลเงินสด (จันทร์-ศุกร์)" 
-            : "แลกรับบัตรชมภาพยนตร์ (เสาร์-อาทิตย์)"}
-        </p>
-        <div className="mt-4 text-[var(--text)] bg-white py-2 px-8 rounded-lg text-lg">
-          จำนวนสิทธิ์แลกรับ{redeemType.name}: <span className="font-bold">{rights}</span> สิทธิ์
+        <div className="flex flex-col gap-4 w-full">
+          {/* Category Selection */}
+          <div className="flex flex-col gap-4">
+            {/* Movie Reward Item */}
+            <button
+              onClick={() => setSelectedCategory('MOVIE')}
+              disabled={!eligibleMovie || usedMovie || (rights <= 0 && selectedCategory !== 'MOVIE')}
+              className={`w-full py-4 rounded-full font-bold text-lg shadow-lg transition-all flex items-center justify-between px-8 border-2 
+                ${selectedCategory === 'MOVIE'
+                  ? 'bg-white text-black border-yellow-400 scale-105 ring-4 ring-yellow-400/50'
+                  : (!eligibleMovie || (rights <= 0 && !usedMovie))
+                    ? 'bg-[#1a0a0c] text-white/30 border-transparent cursor-not-allowed opacity-50'
+                    : usedMovie
+                      ? 'bg-[#2a1215] text-white/50 border-gray-700 opacity-70'
+                      : 'bg-[#4a1d24] text-white border-white/10 hover:bg-[#5a242c]'}`}
+            >
+              <div className="flex items-center gap-3">
+                <span>{(!eligibleMovie || (rights <= 0 && !usedMovie && selectedCategory !== 'MOVIE')) ? '🔒' : '🎬'}</span>
+                <div className="flex flex-col items-start">
+                  <span className="leading-tight">บัตรชมภาพยนตร์ (2,500.-)</span>
+                  {!eligibleMovie && <span className="text-[10px] font-light text-yellow-500/80">สะสมยอดซื้อไม่เพียงพอ</span>}
+                  {eligibleMovie && rights <= 0 && !usedMovie && <span className="text-[10px] font-light text-yellow-500/60">ใช้สิทธิ์ครบตามโควตาประจำวันแล้ว</span>}
+                  {usedMovie && <span className="text-[10px] font-light text-gray-400">แลกรับไปแล้ววันนี้</span>}
+                </div>
+              </div>
+              {selectedCategory === 'MOVIE' && <span className="text-yellow-500">✓</span>}
+            </button>
+
+            {/* Gold Reward Item */}
+            <button
+              onClick={() => setSelectedCategory('GOLD')}
+              disabled={(!eligibleGoldA && !eligibleGoldB) || usedGold || (rights <= 0 && selectedCategory !== 'GOLD')}
+              className={`w-full py-4 rounded-full font-bold text-lg shadow-lg transition-all flex items-center justify-between px-8 border-2
+                ${selectedCategory === 'GOLD'
+                  ? 'bg-white text-black border-yellow-400 scale-105 ring-4 ring-yellow-400/50'
+                  : ((!eligibleGoldA && !eligibleGoldB) || (rights <= 0 && !usedGold))
+                    ? 'bg-[#1a0a0c] text-white/30 border-transparent cursor-not-allowed opacity-50'
+                    : usedGold
+                      ? 'bg-[#2a1215] text-white/50 border-gray-700 opacity-70'
+                      : 'bg-[#4a1d24] text-white border-white/10 hover:bg-[#5a242c]'}`}
+            >
+              <div className="flex items-center gap-3">
+                <span>{((!eligibleGoldA && !eligibleGoldB) || (rights <= 0 && !usedGold && selectedCategory !== 'GOLD')) ? '🔒' : '✨'}</span>
+                <div className="flex flex-col items-start">
+                  <span className="leading-tight">ส่วนลดทองคำ (3,500.-)</span>
+                  {(!eligibleGoldA && !eligibleGoldB) && <span className="text-[10px] font-light text-yellow-500/80">สะสมยอดซื้อไม่เพียงพอ</span>}
+                  {(eligibleGoldA || eligibleGoldB) && rights <= 0 && !usedGold && <span className="text-[10px] font-light text-yellow-500/60">ใช้สิทธิ์ครบตามโควตาประจำวันแล้ว</span>}
+                  {usedGold && <span className="text-[10px] font-light text-gray-400">แลกรับไปแล้ววันนี้</span>}
+                </div>
+              </div>
+              {selectedCategory === 'GOLD' && <span className="text-yellow-500">✓</span>}
+            </button>
+          </div>
+
+          {/* Gold Sub-Selection */}
+          {selectedCategory === 'GOLD' && (
+            <div className="grid grid-cols-1 gap-2 mt-2 bg-black/20 p-4 rounded-2xl animate-in fade-in duration-300">
+              <p className="text-white text-sm mb-2">เลือกรูปแบบส่วนลดทองคำ:</p>
+              <button
+                onClick={() => setSelectedGoldType('redeem003')}
+                className={`py-2 px-4 rounded-full text-sm font-bold transition ${selectedGoldType === 'redeem003' ? 'bg-yellow-400 text-black' : 'bg-white/20 text-white'}`}
+              >
+                ส่วนลดค่ากำเหน็จ 40%
+              </button>
+              <button
+                onClick={() => setSelectedGoldType('redeem004')}
+                className={`py-2 px-4 rounded-full text-sm font-bold transition ${selectedGoldType === 'redeem004' ? 'bg-yellow-400 text-black' : 'bg-white/20 text-white'}`}
+              >
+                ส่วนลดค่ากำเหน็จ 500.-
+              </button>
+              {eligibleGoldA && eligibleGoldB && (
+                <button
+                  onClick={() => setSelectedGoldType('GOLD_BOTH')}
+                  className={`py-2 px-4 rounded-full text-sm font-bold transition ${selectedGoldType === 'GOLD_BOTH' ? 'bg-yellow-400 text-black' : 'bg-white/20 text-white'}`}
+                >
+                  รับทั้ง 2 แบบ (ใช้ 1 สิทธิ์รวม)
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
-        <div className="mt-4 flex flex-col justify-center items-center">
-          <img 
-            src={redeemType.image} 
-            alt={redeemType.name} 
-            className="w-[70%] object-contain" 
-          />
-        </div>
+        {currentReward && (
+          <div className="bg-white py-3 px-6 rounded-full inline-flex justify-center items-center shadow-lg w-full max-w-xs transition-all">
+            <p className="text-lg text-black">
+              คุณมีสิทธิ์แลก: <span className="font-bold">{rights}</span> สิทธิ์
+            </p>
+          </div>
+        )}
 
-        <div className="mt-6 w-11/12 max-w-sm">
-          <div className="flex items-center">
-            <label className="text-[var(--text)] text-lg mr-2 whitespace-nowrap">
-              โรบินสันไลฟ์สไตล์ สาขา
+        {currentReward ? (
+          <div className="mt-2 flex justify-center items-center w-full animate-in fade-in duration-500">
+            <img
+              src={currentReward.image}
+              alt={currentReward.name}
+              className="w-[50%] object-contain drop-shadow-2xl"
+            />
+          </div>
+        ) : (
+          <div className="h-24 flex items-center justify-center text-white/50 italic">
+            กรุณาเลือกประเภทรางวัล
+          </div>
+        )}
+
+        <div className="w-full max-w-xs flex flex-col gap-4">
+          <div className="flex items-center justify-between gap-3">
+            <label className="text-white text-lg whitespace-nowrap">
+              โรบินสันไล์สไตล์ สาขา
             </label>
-            <div className="flex items-center border border-white bg-white rounded-md px-3 py-2 flex-1">
-              <span className="mr-2">R</span>
+            <div className="flex items-center bg-white rounded-full px-5 py-2 flex-1 shadow-md">
+              <span className="mr-1 text-gray-500 font-bold">R</span>
+              <span className="mr-1 text-gray-400">-</span>
               <input
                 type="text"
                 maxLength={3}
                 inputMode="numeric"
-                placeholder="-xxx"
+                placeholder="xxx"
                 pattern="[0-9]*"
                 value={branchCode}
                 onChange={(e) => {
                   const onlyDigits = e.target.value.replace(/\D/g, "");
                   setBranchCode(onlyDigits);
                 }}
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none text-gray-700 bg-transparent font-bold"
               />
             </div>
           </div>
-          <p className="text-center text-md pt-5 text-[var(--text)]">
+          <p className="text-center text-sm text-white opacity-90">
             กรุณากรอกรหัส 3 หลัก ของสาขาโรบินสัน
           </p>
 
           {errorMessage && (
-            <p className="text-red-400 text-sm mt-2 text-center">
+            <p className="text-yellow-300 text-sm font-bold text-center animate-pulse">
               {errorMessage}
             </p>
           )}
         </div>
 
-        <div className="mt-8 flex flex-col gap-4 w-[80%]">
+        <div className="mt-4 flex flex-col gap-4 w-full max-w-[280px]">
           <button
             onClick={handleRedeemClick}
-            className={`w-full inline-flex justify-center items-center rounded-md bg-[var(--button)] py-2 px-10 text-sm text-white shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-700 transition-colors ${rights === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
-            disabled={isConfirming || rights === 0}
+            className={`w-full py-4 rounded-xl font-bold text-xl text-white shadow-xl transition-all transform active:scale-95 ${!currentReward || rights === 0 ? "bg-gray-800 opacity-50 cursor-not-allowed" : "bg-[#4a1d24] hover:bg-black hover:scale-105"}`}
+            disabled={isConfirming || !currentReward || rights === 0}
           >
-            {isConfirming ? "กำลังแลก..." : "ยืนยัน"}
+            {isConfirming ? "กำลังตรวจสอบ..." : "ยืนยัน"}
           </button>
-          
-          <Link 
+
+          <Link
             to="/menu"
-            className="w-full inline-flex justify-center items-center rounded-md bg-white py-2 px-10 text-sm text-[var(--button)] border border-[var(--button)] shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-100 transition-colors"
+            className="w-full py-3 rounded-xl font-bold text-lg bg-white text-[var(--bg)] shadow-lg transition-transform hover:scale-105 active:scale-95 text-center"
           >
             กลับหน้าหลัก
           </Link>
         </div>
       </div>
 
-      {showConfirmDialog && stockItem && (
-        <div 
+      {showConfirmDialog && stockItem && currentReward && (
+        <div
           className="fixed inset-0 backdrop-blur-md flex justify-center items-center z-50 px-4"
-          style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' 
-        }}>
-          <div className="bg-white rounded-lg shadow-xl border border-gray-200 w-full max-w-md mx-auto relative">
-            {/* Close button */}
-            <button
-              onClick={cancelRedeem}
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl font-bold z-10"
-            >
-              ×
-            </button>
-            
-            {/* Content container with proper padding */}
-            <div className="p-6 pt-8">
-              {/* Title */}
-              <h3 className="text-lg md:text-xl font-semibold text-center mb-4 leading-relaxed">
-                คุณยืนยันแลกรับ{redeemType.name}
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+        >
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm mx-auto relative overflow-hidden font-kanit">
+            <div className="p-8 flex flex-col items-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <span className="text-4xl text-green-600">✓</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 text-center mb-2 leading-relaxed">
+                ยืนยันการแลกรับ
               </h3>
-              
-              {/* Branch info */}
-              <p className="text-center mb-4 text-base md:text-lg">
-                ณ โรบินสันไลฟ์สไตล์สาขา{" "}
-                <span className="font-bold text-blue-600">
-                  {findFilteredBranchNameByBranchId(combinedBranchId)}
-                </span>{" "}
-                หรือไม่
-              </p>
-              
-              {/* Deduction info */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                <p className="text-center text-sm md:text-base text-gray-700 leading-relaxed">
-                  สิทธิ์แลกรับ{redeemType.name}ของคุณจะถูกหักออก
-                </p>
-                <p className="text-center font-bold text-red-600 text-base md:text-lg mt-2">
-                  จำนวน {redeemType.deductionText}
-                </p>
+              <p className="text-gray-500 text-center mb-6">{currentReward.name}</p>
+
+              <div className="w-full space-y-4 mb-8">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-400">สาขา</span>
+                  <span className="font-bold text-black">{findFilteredBranchNameByBranchId(combinedBranchId)}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-400">หักสิทธิ์การแลก</span>
+                  <span className="font-bold text-red-600">{currentReward.deductionText}</span>
+                </div>
               </div>
-              
-              {/* Stock info */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-6">
-                <p className="text-center font-semibold text-green-700 text-sm md:text-base">
-                  เหลือสต็อกสาขานี้: {stockItem.amount} ชิ้น
-                </p>
-              </div>
-              
-              {/* Action buttons - Updated to match TermsRedeem style */}
-              <div className="flex flex-col gap-4 w-full mt-6">
+
+              <div className="flex flex-col gap-3 w-full">
                 <button
                   onClick={confirmRedeem}
                   disabled={isConfirming}
-                  className="w-full inline-flex justify-center items-center gap-2 rounded-md bg-[var(--button)] py-2 px-10 text-sm text-white shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-700 transition-colors text-center"
-                  type="submit"
+                  className="w-full py-4 rounded-2xl bg-[var(--bg)] text-white font-bold shadow-lg hover:shadow-red-200/50 transition-all active:scale-95"
                 >
-                  {isConfirming ? "กำลังดำเนินการ..." : "ยืนยัน"}
+                  {isConfirming ? "กำลังแลกรับ..." : "ยืนยันการแลกรับสิทธิ์"}
                 </button>
                 <button
                   onClick={cancelRedeem}
-                  className="w-full inline-flex justify-center items-center gap-2 rounded-md bg-white py-2 px-10 text-sm text-[var(--button)] border border-[var(--button)] shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-100 transition-colors text-center"
+                  className="w-full py-4 rounded-2xl bg-gray-50 text-gray-400 font-bold hover:bg-gray-100 transition-colors"
                 >
                   ยกเลิก
                 </button>

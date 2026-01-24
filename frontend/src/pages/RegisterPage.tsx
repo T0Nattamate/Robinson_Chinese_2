@@ -23,7 +23,7 @@ interface Register {
   lineId: string;
   lineProfilePic: string;
   isTheOne: boolean;
-  theOneId:string;
+  theOneId: string;
 }
 import { useUserStore } from "../store/userStore";
 import { handleError, showAlert } from "../data/functions";
@@ -154,7 +154,7 @@ const RegisterPage = () => {
   //     if (!register.theOneId) {
   //       theOneError = "กรุณากรอกหมายเลข The1";
   //     }
-      
+
   //   }
   //   setError((prev) => ({ ...prev, theOneId: theOneError }));
   // };
@@ -229,7 +229,7 @@ const RegisterPage = () => {
           throw new Error("JWT Token not found in response.");
         }
 
-        
+
       } catch (error) {
         setIsLoading(false);
         if (axios.isAxiosError(error)) {
@@ -258,13 +258,13 @@ const RegisterPage = () => {
       {/* Overlay for loading */}
       {isLoading && <LoadingOverlay />}
       <div className="w-full h-full min-h-[400px] bg-white md:w-96 ">
-        <img src="banner_major.webp" alt="header1page" className="w-full" />
+        <img src="//banner_major.webp" alt="header1page" className="w-full" />
       </div>
-       
-  
+
+
       {/* Content */}
       <div className=" flex flex-col justify-start items-center w-[90%] md:w-96 md:h-[34rem] min-h-[40rem] text-center gap-5 py-5 px-2 mt-5 ">
-      <h1 className="text-3xl text-[var(--text)]">ลงทะเบียน</h1>
+        <h1 className="text-3xl text-[var(--text)]">ลงทะเบียน</h1>
         <Form
           className="flex flex-col items-center gap-8 w-full"
           onSubmit={handleRegisterSubmit}
@@ -398,10 +398,10 @@ const RegisterPage = () => {
           </div>
 
 
-          
-            
-            {/* Split section line */}
-            <div className="w-full border-t border-black my-1"></div>
+
+
+          {/* Split section line */}
+          <div className="w-full border-t border-black my-1"></div>
           {/* Checkboxes */}
           <section className="flex flex-col gap-3 w-full">
             <Checkbox onChange={handleTermsCheckboxChange}>
@@ -415,7 +415,7 @@ const RegisterPage = () => {
               </span>
             </Checkbox>
           </section>
-  
+
           {/* Submit Button */}
           <Button
             type="submit"
@@ -424,7 +424,7 @@ const RegisterPage = () => {
             Register
           </Button>
         </Form>
-  
+
         {/* Terms & Rules Dialogs */}
         <TermsDialog
           isTermsOpen={isTermsOpen}
@@ -435,7 +435,7 @@ const RegisterPage = () => {
           handleRulesDialogClose={handleRulesDialogClose}
         />
       </div>
-  
+
       {/* Footer */}
       <div className="w-full h-20 md:h-32 relative"></div>
     </div>

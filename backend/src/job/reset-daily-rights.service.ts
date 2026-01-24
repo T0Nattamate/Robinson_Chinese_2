@@ -10,12 +10,11 @@ export class ResetDailyRightsService {
 
   // promotion perioods
   private readonly PROMOTION_PERIODS_BKK: Array<{ start: moment.Moment; end: moment.Moment }> = [
-    { start: moment.tz('2025-10-23 00:00:00', this.TZ), end: moment.tz('2025-10-31 23:59:59', this.TZ) }, //prod
-    //{ start: moment.tz('2025-10-13 00:00:00', this.TZ), end: moment.tz('2025-10-31 23:59:59', this.TZ) }, //test
-    { start: moment.tz('2025-11-25 00:00:00', this.TZ), end: moment.tz('2025-12-03 23:59:59', this.TZ) },
+    //{ start: moment.tz('2026-02-02T00:00:00+07:00', this.TZ), end: moment.tz('2026-02-24T23:59:59+07:00', this.TZ) }, //prod
+    { start: moment.tz('2026-01-20T00:00:00+07:00', this.TZ), end: moment.tz('2026-02-02T23:59:59+07:00', this.TZ) }, //test
   ];
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private isInPromotionBkk(d: moment.Moment): boolean {
     // compare using full seconds (inclusive)
@@ -85,13 +84,13 @@ export class ResetDailyRightsService {
   /**
    * Optional housekeeping (e.g. weekly): delete very old expired rows
    */
-//   @Cron('0 3 * * 0', { timeZone: 'Asia/Bangkok' })
-//   async cleanupOldExpiredDailyRights() {
-//     const cutoff = moment().tz(this.TZ).subtract(60, 'days').startOf('day');
-//     const cutoffDate = new Date(cutoff.format('YYYY-MM-DD'));
-//     const delRes = await this.prisma.dailyRedemptionRight.deleteMany({
-//       where: { isExpired: true, dateEarned: { lt: cutoffDate } },
-//     });
-//     this.logger.log(`[CRON] cleanup removed ${delRes.count} old expired rows`);
-//   }
+  //   @Cron('0 3 * * 0', { timeZone: 'Asia/Bangkok' })
+  //   async cleanupOldExpiredDailyRights() {
+  //     const cutoff = moment().tz(this.TZ).subtract(60, 'days').startOf('day');
+  //     const cutoffDate = new Date(cutoff.format('YYYY-MM-DD'));
+  //     const delRes = await this.prisma.dailyRedemptionRight.deleteMany({
+  //       where: { isExpired: true, dateEarned: { lt: cutoffDate } },
+  //     });
+  //     this.logger.log(`[CRON] cleanup removed ${delRes.count} old expired rows`);
+  //   }
 }

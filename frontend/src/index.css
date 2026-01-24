@@ -10,15 +10,15 @@
 
 
 :root {
-  --bg: #71C7AE;   
-    --button: #062F29;
-    --text: #000000;
-    --term-head: #231f20;
-    --light-green: #8EC63F;
-    --text-color-disabled:#727272;
-    --gold: #ffe11d;
-    --black: #000000;
-    --red: #C8102E;
+  --bg: #C8102E;
+  --button: #062F29;
+  --text: #000000;
+  --term-head: #231f20;
+  --light-green: #8EC63F;
+  --text-color-disabled: #727272;
+  --gold: #ffe11d;
+  --black: #000000;
+  --red: #C8102E;
 }
 
 .button-base {
@@ -26,15 +26,15 @@
 }
 
 .button-outlined {
-  @apply bg-transparent border-[2px] px-3 py-2 rounded-md  hover:border-slate-400 hover:text-slate-400 duration-200;
+  @apply bg-transparent border-[2px] px-3 py-2 rounded-md hover:border-slate-400 hover:text-slate-400 duration-200;
 }
 
 .card {
-  @apply  rounded-lg
+  @apply rounded-lg
 }
 
 .x-flex {
-    @apply flex gap-3 items-center
+  @apply flex gap-3 items-center
 }
 
 .flex-auto-center {
@@ -43,22 +43,22 @@
 
 
 .text-field-aria {
-@apply relative w-full min-w-[200px] h-10
+  @apply relative w-full min-w-[200px] h-10
 }
 
 /* Container for the datepicker */
 .react-datepicker {
-  @apply border border-gray-300 rounded-lg shadow-lg bg-white ;
+  @apply border border-gray-300 rounded-lg shadow-lg bg-white;
 }
 
 /* Calendar Header (Month and Year Selector) */
 .react-datepicker__header {
-  @apply bg-gray-100 border-b border-gray-200 rounded-t-lg p-3 ;
+  @apply bg-gray-100 border-b border-gray-200 rounded-t-lg p-3;
 }
 
 /* Month and Year text */
 .react-datepicker__current-month {
-  @apply text-gray-800 font-bold text-lg  z-20;
+  @apply text-gray-800 font-bold text-lg z-20;
 }
 
 /* Navigation buttons (next/previous months) */
@@ -72,12 +72,12 @@
 
 /* Weekday header (Mon, Tue, etc.) */
 .react-datepicker__day-names {
-  @apply grid grid-cols-7 gap-0.5 text-gray-700 text-sm font-medium ;
+  @apply grid grid-cols-7 gap-0.5 text-gray-700 text-sm font-medium;
 }
 
 /* Each day cell */
 .react-datepicker__day {
-  @apply text-gray-800 text-sm m-1 hover:bg-blue-100 items-center p-1 ;
+  @apply text-gray-800 text-sm m-1 hover:bg-blue-100 items-center p-1;
 }
 
 /* Selected day */
@@ -89,9 +89,10 @@
 
 .react-datepicker__day:hover {
   border-radius: 50%;
-  background-color: #DFDFDF !important; /* Change this to your desired color */
+  background-color: #DFDFDF !important;
+  /* Change this to your desired color */
   color: #101828;
-   /* Change this to your desired color */
+  /* Change this to your desired color */
 }
 
 
@@ -101,7 +102,7 @@
 }
 
 .react-datepicker__day--in-selecting-range {
-  background-color: #DFDFDF !important; 
+  background-color: #DFDFDF !important;
   color: #101828;
 }
 
