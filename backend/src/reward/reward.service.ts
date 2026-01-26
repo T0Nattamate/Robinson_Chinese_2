@@ -25,13 +25,13 @@ export class RewardService {
             where: { branchId, redeemId: RewardType.MOVIE, isEnable: true },
         });
 
-        // 2. Get Gold Stock (Global)
+        // 2. Get Gold Stock (Branch specific)
         const goldAStock = await this.prisma.branchStock.findFirst({
-            where: { branchId: 'GLOBAL', redeemId: RewardType.GOLD_A, isEnable: true },
+            where: { branchId, redeemId: RewardType.GOLD_A, isEnable: true },
         });
 
         const goldBStock = await this.prisma.branchStock.findFirst({
-            where: { branchId: 'GLOBAL', redeemId: RewardType.GOLD_B, isEnable: true },
+            where: { branchId, redeemId: RewardType.GOLD_B, isEnable: true },
         });
 
         return [
@@ -111,9 +111,8 @@ export class RewardService {
                 throw new ConflictException('คุณยังทำยอดสะสมไม่ถึงเกณฑ์สำหรับรางวัลนี้');
             }
 
-            const stockBranchId = (target === RewardType.GOLD_A || target === RewardType.GOLD_B) ? 'GLOBAL' : branchId;
             const stock = await this.prisma.branchStock.findFirst({
-                where: { branchId: stockBranchId, redeemId: target, isEnable: true, amount: { gt: 0 } },
+                where: { branchId, redeemId: target, isEnable: true, amount: { gt: 0 } },
             });
 
             if (!stock) {
@@ -124,13 +123,11 @@ export class RewardService {
         // 5. Atomic Transaction
         return await this.prisma.$transaction(async (tx) => {
             for (const target of targets) {
-                const stockBranchId = (target === RewardType.GOLD_A || target === RewardType.GOLD_B) ? 'GLOBAL' : branchId;
-
                 // Update Stock
                 await tx.branchStock.update({
                     where: {
                         branchId_redeemId: {
-                            branchId: stockBranchId,
+                            branchId,
                             redeemId: target,
                         },
                     },

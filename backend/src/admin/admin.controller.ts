@@ -8,10 +8,15 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
+  AddStoresBulkDto,
   CreateAdminDto,
   CreateLuckyDto,
   UpdateAdminDto,
@@ -25,7 +30,7 @@ import { Response } from 'express';
 
 @Controller('/admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) { }
 
   @Post('/create')
   // @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -313,7 +318,7 @@ export class AdminController {
       } else if (query.theOne === 'false') {
         processedTheOne = false;
       }
-      
+
       // Convert "orderBy" from string to "asc" | "desc" | "vip" or undefined
       let processedOrderBy: 'allPoints' | 'accPoints' | 'desc' | undefined;
       if (query.orderBy === 'allPoints' || query.orderBy === 'accPoints' || query.orderBy === 'desc') {
@@ -404,18 +409,26 @@ export class AdminController {
 
   @Get('/download/claimed')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.superAdmin)
+  @Roles(Role.superAdmin, Role.branchAdmin)
   async exportClaimed(
+    @Req() req: any,
     @Res() res: Response,
     @Query()
     query: {
       branchId?: string;
+      rewardId?: string;
       startDate?: string;
       endDate?: string;
       phone?: string;
     },
   ) {
     try {
+      const admin = req.user;
+      // If branchAdmin, force their branchId to ensure they only see their branch's data
+      if (admin.role === Role.branchAdmin) {
+        query.branchId = admin.branchId;
+      }
+
       const excelBuffer = await this.adminService.exportClaimedHist(query);
 
       res.setHeader(
@@ -433,5 +446,29 @@ export class AdminController {
         error: error.message,
       });
     }
+  }
+
+  @Post('/store/add')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.branchAdmin, Role.superAdmin)
+  async addStoresBulk(@Body() dto: AddStoresBulkDto) {
+    return this.adminService.addStoresBulk(dto.branchId, dto.stores);
+  }
+
+  @Post('/store/upload')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.branchAdmin, Role.superAdmin)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadStoresExcel(
+    @Query('branchId') branchId: string,
+    @UploadedFile() file: any,
+  ) {
+    if (!branchId) {
+      throw new BadRequestException('branchId is required');
+    }
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+    return this.adminService.uploadStoresExcel(branchId, file);
   }
 }

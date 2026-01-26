@@ -78,7 +78,7 @@ export interface LuckyResponse {
   userId: number;
   fullname: string;
   phone: string;
-  week:number;
+  week: number;
   mostBranchName: string;
 }
 export interface BranchStockUpdateResponse {
@@ -120,8 +120,8 @@ export type RewardsRespond = {
   branchStockId: number;
   branchId: string;
   branchName: string;
-  redeemId: string; 
-  gotRedeemded: number; 
+  redeemId: string;
+  gotRedeemded: number;
   amount: number;
   isEnable: boolean;
   updatedAt: string;
@@ -285,7 +285,7 @@ interface AdminStore {
   deleteLuckyByAdmin: (phone: string) => void;
   getStockInBranch: (branchId: string) => Promise<Partial<RewardsRespond>>;
   updateStockInBranch: (
-    body: { adminId: string; branchId: string; redeemId:string; amount: number; isEnable?: boolean }
+    body: { adminId: string; branchId: string; redeemId: string; amount: number; isEnable?: boolean }
   ) => Promise<Partial<BranchStockUpdateResponse>>;
   downloadAllReceipt: (
     receiptNo?: string,
@@ -342,18 +342,18 @@ interface AdminStore {
   ) => void;
   fetchAllStatRedeem: (redeemId: string) => Promise<RewardRedeemStat[]>;
   fetchBranchStatRedeem: (
-    redeemId:string,
+    redeemId: string,
     branchId: string
   ) => Promise<Partial<RewardRedeemStat[]>>;
   fetchStockTransaction: (branchId: string) => Promise<Partial<Transaction[]>>;
   updateNewBranch: (
-    body: { adminId: string , branchId: string }
+    body: { adminId: string, branchId: string }
   ) => Promise<UpdateBranchResponse>;
   updateNewPassword: (
     body: { adminId: string, newPassword: string }
   ) => Promise<UpdatePasswordResponse>;
   validateOldPassword: (
-    body: { adminId: string,inputPassword: string }
+    body: { adminId: string, inputPassword: string }
   ) => Promise<ValidatePasswordResponse>;
   clearAdminData: () => void;
   enableAdmin: (
@@ -368,6 +368,8 @@ interface AdminStore {
     startDate?: string,
     endDate?: string
   ) => void;
+  addStoresBulkAction: (branchId: string, stores: any[]) => Promise<any>;
+  uploadStoresExcelAction: (branchId: string, file: File) => Promise<any>;
 }
 
 import useAuthStore from "./AuthStore";
@@ -666,7 +668,7 @@ export const useAdminStore = create<AdminStore>()(
           const accessToken = useAuthStore.getState().accessToken;
           const response = await axiosInceptor.post(
             "/admin/create",
-            { username, password, branchId},
+            { username, password, branchId },
             {
               headers: {
                 "Content-Type": "application/json",
@@ -831,7 +833,7 @@ export const useAdminStore = create<AdminStore>()(
           pageSize,
           cursor: nextCursor,
         };
-        
+
         if (rewardId) params.rewardId = rewardId;
         if (phone) params.phone = phone;
         if (startDate) params.startDate = startDate;
@@ -871,7 +873,7 @@ export const useAdminStore = create<AdminStore>()(
 
         if (phone) params.phone = phone;
         if (theOne) params.theOne = theOne;
-        
+
         // Sort logic
 
         if (orderBy) params.orderBy = orderBy;
@@ -918,9 +920,9 @@ export const useAdminStore = create<AdminStore>()(
 
           if (phone) params.phone = phone;
           if (theOne) params.theOne = theOne;
-          
+
           // Sort logic
-          if(orderBy) params.orderBy = orderBy;
+          if (orderBy) params.orderBy = orderBy;
           if (theOneId) params.theOneId = theOneId;
           if (startDate) params.startDate = startDate;
           if (endDate) params.endDate = endDate;
@@ -1064,7 +1066,7 @@ export const useAdminStore = create<AdminStore>()(
         }
       },
       updateStockInBranch: async (
-        body: { adminId: string;branchId: string; redeemId:string; amount: number; isEnable?: boolean }
+        body: { adminId: string; branchId: string; redeemId: string; amount: number; isEnable?: boolean }
       ) => {
         try {
           const accessToken = useAuthStore.getState().accessToken;
@@ -1155,7 +1157,7 @@ export const useAdminStore = create<AdminStore>()(
       ) => {
         const accessToken = useAuthStore.getState().accessToken;
         const params: Record<string, string | undefined> = {};
-        if(branchId) params.branchId = branchId;
+        if (branchId) params.branchId = branchId;
         if (receiptNo) params.receiptNo = receiptNo;
         if (phone) params.phone = phone;
         if (startDate) params.startDate = startDate;
@@ -1251,7 +1253,7 @@ export const useAdminStore = create<AdminStore>()(
       ) => {
         const params: Record<string, string | undefined> = {};
 
-        if(branchId) params.branchId = branchId;
+        if (branchId) params.branchId = branchId;
         if (phone) params.phone = phone;
         if (rewardId) params.rewardId = rewardId;
         if (startDate) params.startDate = startDate;
@@ -1383,14 +1385,14 @@ export const useAdminStore = create<AdminStore>()(
         endDate?: string
       ) => {
         const params: Record<string, string | undefined> = {};
-      
+
         if (phone) params.phone = phone;
         if (theOne) params.theOne = theOne;
         if (theOneId) params.theOneId = theOneId;
         if (startDate) params.startDate = startDate;
         if (endDate) params.endDate = endDate;
-        if(orderBy) params.orderBy = orderBy;
-      
+        if (orderBy) params.orderBy = orderBy;
+
         try {
           const accessToken = useAuthStore.getState().accessToken;
           const response = await axiosInceptor.get(`/admin/download/customers`, {
@@ -1401,7 +1403,7 @@ export const useAdminStore = create<AdminStore>()(
             },
             responseType: "blob",
           });
-      
+
           const blob = new Blob([response.data], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           });
@@ -1417,7 +1419,7 @@ export const useAdminStore = create<AdminStore>()(
           throw error;
         }
       },
-      
+
       fetchAllStatRedeem: async (redeemId: string) => {
         const accessToken = useAuthStore.getState().accessToken;
 
@@ -1476,7 +1478,7 @@ export const useAdminStore = create<AdminStore>()(
         }
       },
       validateOldPassword: async (
-        body: { adminId: string,inputPassword: string }
+        body: { adminId: string, inputPassword: string }
       ) => {
         try {
           const accessToken = useAuthStore.getState().accessToken;
@@ -1507,7 +1509,7 @@ export const useAdminStore = create<AdminStore>()(
         }
       },
       updateNewPassword: async (
-        body: { adminId: string,newPassword: string }
+        body: { adminId: string, newPassword: string }
       ) => {
         try {
           const accessToken = useAuthStore.getState().accessToken;
@@ -1537,7 +1539,7 @@ export const useAdminStore = create<AdminStore>()(
           return Promise.reject("An unknown error occurred.");
         }
       },
-      updateNewBranch: async ( 
+      updateNewBranch: async (
         body: { adminId: string, branchId: string }
       ) => {
         try {
@@ -1577,7 +1579,7 @@ export const useAdminStore = create<AdminStore>()(
           const accessToken = useAuthStore.getState().accessToken;
           const response = await axiosInceptor.patch(
             `/admin/update`,
-            { adminId,isEnable: isEnabled  },
+            { adminId, isEnable: isEnabled },
             {
               headers: {
                 "Content-Type": "application/json",
@@ -1615,7 +1617,7 @@ export const useAdminStore = create<AdminStore>()(
 
         if (startDate) params.startDate = startDate;
         if (endDate) params.endDate = endDate;
-        if(orderBy) params.orderBy = orderBy;
+        if (orderBy) params.orderBy = orderBy;
         try {
           const accessToken = useAuthStore.getState().accessToken;
           const response = await axiosInceptor.get(
@@ -1641,6 +1643,43 @@ export const useAdminStore = create<AdminStore>()(
           a.click();
           document.body.removeChild(a);
           window.URL.revokeObjectURL(url);
+        } catch (error) {
+          throw error;
+        }
+      },
+      addStoresBulkAction: async (branchId: string, stores: any[]) => {
+        try {
+          const accessToken = useAuthStore.getState().accessToken;
+          const response = await axiosInceptor.post(
+            "/admin/store/add",
+            { branchId, stores },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+          return response.data;
+        } catch (error) {
+          throw error;
+        }
+      },
+      uploadStoresExcelAction: async (branchId: string, file: File) => {
+        try {
+          const accessToken = useAuthStore.getState().accessToken;
+          const formData = new FormData();
+          formData.append("file", file);
+          const response = await axiosInceptor.post(
+            `/admin/store/upload?branchId=${branchId}`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          return response.data;
         } catch (error) {
           throw error;
         }

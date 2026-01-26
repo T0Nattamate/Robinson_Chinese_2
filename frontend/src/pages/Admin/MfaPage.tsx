@@ -85,11 +85,11 @@ const MfaPage = () => {
       {isLoading && <LoadingOverlay />}
       <div className="hidden  lg:w-full h-full min-h-screen bg-cover bg-center lg:flex items-center justify-center bg-[var(--bg)]"
         style={{
-          backgroundImage: `url('/bg-02.jpg')`,backgroundPosition: "center 10rem" 
+          backgroundImage: `url('/bg-02.jpg')`, backgroundPosition: "center 10rem"
         }}
       >
         <img
-          src="/banner_cut.webp"
+          src="//banner_cut.webp"
           alt="garnierlogo"
           className="w-full h-full"
         />

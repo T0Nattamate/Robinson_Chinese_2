@@ -28,6 +28,7 @@ import AdminDashboardLayout from "./pages/Admin/AdminsDashboardLayout";
 import LoginPage from "./pages/LoginPage";
 import ClearPage from "./pages/ClearPage";
 import CreateLucky from "./components/AdminDashboard/CreateLucky";
+import AddStore from "./components/AdminDashboard/AddStore";
 import RedeemHistoryPage from "./pages/RedeemHistoryPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -35,7 +36,7 @@ import useAuthStore from "./store/AuthStore";
 
 function App() {
   axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
-  const { accessToken, isAcceptUpload, isAcceptRedeem, isMfa , canAccessTermsRedeem, canAccessTermsUpload} =
+  const { accessToken, isAcceptUpload, isAcceptRedeem, isMfa, canAccessTermsRedeem, canAccessTermsUpload } =
     useAuthStore();
   return (
     <Router>
@@ -43,7 +44,7 @@ function App() {
         {/* Public User */}
         <Route path="/" element={<ClearPage />} />
         {/* <Route path="/test" element={<DevTestPage />} /> */}
-        <Route path="/secret-login" element={<LoginPage />} /> 
+        <Route path="/secret-login" element={<LoginPage />} />
         <Route path="/loading" element={<LoadingAfterLogin />} />
         <Route path="/register" element={<RegisterPage />} />
         {/* using jwt */}
@@ -226,6 +227,7 @@ function App() {
           <Route path="customers" element={<CustomerAdmin />} />
           <Route path="lucky" element={<CreateLucky />} />
           <Route path="stock" element={<StockDashboard />} />
+          <Route path="add-store" element={<AddStore />} />
           <Route path="secret" element={<SecretAdminEdit />} />
         </Route>
 

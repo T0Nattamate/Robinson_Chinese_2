@@ -5,7 +5,7 @@ import { IoBarChartOutline } from "react-icons/io5";
 //import { GoTrophy } from "react-icons/go";
 import { GoPencil } from "react-icons/go";
 import { BsTruck } from "react-icons/bs";
-import { PiGear, PiUserListLight } from "react-icons/pi";
+import { PiGear, PiUserListLight, PiStorefront } from "react-icons/pi";
 import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useAdminStore } from "../store/AdminStore";
@@ -39,9 +39,8 @@ const AdminSidebarSmall: React.FC<AdminSidebarSmallProps> = ({
   }
   return (
     <div
-      className={`fixed top-0 left-0 h-full bg-white  shadow-xl transition-all duration-300 z-40 ${
-        isSidebarOpen ? "-translate-x-full" : "translate-x-0"
-      }`}
+      className={`fixed top-0 left-0 h-full bg-white  shadow-xl transition-all duration-300 z-40 ${isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+        }`}
     >
       <div className="h-[calc(100vh-2rem)] w-[4.5rem] bg-white min-h-screen shadow-xl shadow-blue-gray-900/5">
         <Menu className="font-light mt-2 ">
@@ -61,8 +60,8 @@ const AdminSidebarSmall: React.FC<AdminSidebarSmallProps> = ({
               }}
             >
               <div className="flex flex-col items-center">
-              <img src="/logo.png" alt="robinsonlogo" />
-        </div>
+                <img src="/logo.png" alt="robinsonlogo" />
+              </div>
             </section>
           </div>
 
@@ -86,6 +85,13 @@ const AdminSidebarSmall: React.FC<AdminSidebarSmallProps> = ({
             <MenuItem
               icon={<IoReceiptOutline />}
               component={<Link to="/admin/dashboard/redeem" />}
+            ></MenuItem>
+          )}
+
+          {(isSuperAdmin === true || isSuperAdmin === false) && (
+            <MenuItem
+              icon={<PiStorefront />}
+              component={<Link to="/admin/dashboard/add-store" />}
             ></MenuItem>
           )}
 

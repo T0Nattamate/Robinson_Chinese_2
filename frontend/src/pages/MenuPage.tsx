@@ -13,7 +13,6 @@ const MenuPage = () => {
   const PROMOTION_PERIODS = [
     //{ start: new Date('2026-02-02T00:00:00+07:00'), end: new Date('2026-02-24T23:59:59+07:00') }, //prod
     { start: new Date('2026-01-20T00:00:00+07:00'), end: new Date('2026-02-02T23:59:59+07:00') }, //test
-    //{ start: new Date('2026-02-24T00:00:00+07:00'), end: new Date('2025-12-03T23:59:59+07:00') },
   ];
 
   // Check if current date is within promotion period
@@ -67,8 +66,8 @@ const MenuPage = () => {
 
   return (
     <div className="font-kanit bg-[var(--bg)] w-full min-h-screen md:h-full flex flex-col justify-center items-center relative">
-      <div className="w-full bg-white md:w-96 flex items-center justify-center">
-        <img src="//banner_major.webp" alt="header1page" className="w-full object-contain" />
+      <div className="w-full h-full min-h-[400px] md:w-96 relative bg-white">
+        <img src="//banner_major.webp" alt="header1page" className="w-full" />
       </div>
       <div className="flex flex-col justify-center items-center w-[90%] md:w-96 md:h-full text-center gap-5 py-5">
         <h1 className="text-3xl text-[var(--text)]">Home</h1>

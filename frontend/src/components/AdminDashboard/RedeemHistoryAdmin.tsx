@@ -24,7 +24,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 //import { premiumReward } from "../../data/dataVariables";
-import { formatDateToYYYYMMDD} from "../../data/functions";
+import { formatDateToYYYYMMDD } from "../../data/functions";
 import { FiDownload } from "react-icons/fi";
 import {
   Combobox,
@@ -123,10 +123,10 @@ const RedeemHistoryAdmin = () => {
     query === ""
       ? branches
       : branches.filter((branch) => {
-          return branch.branchName
-            .toLowerCase()
-            .includes(query.toLowerCase());
-        });
+        return branch.branchName
+          .toLowerCase()
+          .includes(query.toLowerCase());
+      });
 
   //API calling
   const [redemptionData, setredemptionData] = useState<Redemption[]>([]);
@@ -449,7 +449,7 @@ const RedeemHistoryAdmin = () => {
       const formattedEndDate = endDate
         ? formatDateToYYYYMMDD(endDate)
         : undefined;
-   
+
       if (isSuperAdmin) {
         if (selected === null) {
           // 1. SuperAdmin show All
@@ -483,7 +483,7 @@ const RedeemHistoryAdmin = () => {
       }
     } catch (error) {
       let errorMessage = "เกิดข้อผิดพลาดในการดาวน์โหลด";
-   
+
       if (error instanceof Error) {
         if (error.message === "Network Error") {
           errorMessage = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้";
@@ -493,7 +493,7 @@ const RedeemHistoryAdmin = () => {
           errorMessage = "ไม่พบข้อมูลที่ต้องการดาวน์โหลด";
         }
       }
-   
+
       Swal.fire({
         icon: "error",
         text: errorMessage,
@@ -503,11 +503,11 @@ const RedeemHistoryAdmin = () => {
           confirmButton: "bg-gray-700 text-white rounded-md font-kanit",
         },
       });
-   
+
       // Optional: Log error for debugging
       console.error("Download redemption error:", error);
     }
-   };
+  };
 
   ////console.log(refreshData);
   //console.log(selectedRewardId);
@@ -535,11 +535,11 @@ const RedeemHistoryAdmin = () => {
             const data = await fetchBranchStatRedeem(redeemId, branchId);
             return Array.isArray(data)
               ? data.map((item: any) => ({
-                  redeemId: item.redeemId,
-                  branchId: item.branchId,
-                  gotRedeemded: item.gotRedeemded,
-                  sumgotRedeemded: item.sumgotRedeemded,
-                }))
+                redeemId: item.redeemId,
+                branchId: item.branchId,
+                gotRedeemded: item.gotRedeemded,
+                sumgotRedeemded: item.sumgotRedeemded,
+              }))
               : [data];
           } else {
             const data = await fetchAllStatRedeem(redeemId);
@@ -661,21 +661,26 @@ const RedeemHistoryAdmin = () => {
               <h2 className="text-[2rem] -mt-5">{item.count}</h2>
             </div>
           ))} */}
-            {statData.map((item) => (
+          {statData.map((item) => (
             <div
               key={item.redeemId}
               className={`rounded-xl w-56 max-w-72 h-40 p-7 flex flex-col gap-3 relative bg-white`}
             >
-               <h1 className="text-xl">{item.redeemId == "redeem001" ? 'Movie Ticket' : 'Gift Voucher'}</h1>
-                <p className="text-sm">
-                  {item.branchId ? 'จำนวนที่ถูกแลกในสาขา' : 'จำนวนที่ถูกแลกไปแล้วทั้งหมด'}
-                </p>
-                <h2 className="text-[2rem] -mt-2 relative">
-                  {item.gotRedeemded !== undefined ? item.gotRedeemded : item.sumgotRedeemded}
-                </h2>
+              <h1 className="text-xl">
+                {item.redeemId === "redeem001" ? 'บัตรชมภาพยนตร์ 2 ใบ' :
+                  item.redeemId === "redeem003" ? 'ส่วนลดค่ากำเหน็จ 40%' :
+                    item.redeemId === "redeem004" ? 'ส่วนลดค่ากำเหน็จ 500.-' :
+                      item.redeemId}
+              </h1>
+              <p className="text-sm">
+                {item.branchId ? 'จำนวนที่ถูกแลกในสาขา' : 'จำนวนที่ถูกแลกไปแล้วทั้งหมด'}
+              </p>
+              <h2 className="text-[2rem] -mt-2 relative">
+                {item.gotRedeemded !== undefined ? item.gotRedeemded : item.sumgotRedeemded}
+              </h2>
             </div>
           ))}
-          
+
         </section>
 
         {/* Filters*/}
@@ -740,7 +745,7 @@ const RedeemHistoryAdmin = () => {
                 <MdOutlineClear />
               </div>
             </div>
-            
+
             {isSuperAdmin && (
               <div
                 className="cursor-pointer flex bg-[var(--button)] items-center h-10 w-full justify-center md:w-auto gap-2 p-1 py-2  rounded-lg md:ml-5"
@@ -797,7 +802,10 @@ const RedeemHistoryAdmin = () => {
                       {redemption.date}
                     </td>
                     <td className="w-16 text-center border-b border-b-slate-400 pb-3 pt-2 h-12">
-                      {redemption.redeemId == "redeem001" ? 'Movie Ticket' : 'Gift Voucher'}
+                      {redemption.redeemId === "redeem001" ? 'บัตรชมภาพยนตร์ 2 ใบ' :
+                        redemption.redeemId === "redeem003" ? 'ส่วนลดค่ากำเหน็จ 40%' :
+                          redemption.redeemId === "redeem004" ? 'ส่วนลดค่ากำเหน็จ 500.-' :
+                            redemption.redeemId}
                     </td>
                     <td className="w-16 text-center border-b border-b-slate-400 pb-3 pt-2 h-12">
                       {findBranchNameByBranchId(redemption.branchId)}
@@ -838,7 +846,7 @@ const RedeemHistoryAdmin = () => {
               <SelectValue
                 className="flex-1 truncate data-[placeholder]:font-base  text-slate-500"
 
-                //className={InputCss}
+              //className={InputCss}
               />
             </Button>
             <Popover

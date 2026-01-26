@@ -14,6 +14,7 @@ import {
   CreateAdminDto,
   CreateLuckyDto,
   UpdateAdminDto,
+  AddStoreDto,
 } from './dto/admin.dto';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
@@ -356,13 +357,17 @@ export class AdminService {
   }
 
   async recalculateTopSpenderAmount(prisma: Prisma.TransactionClient, lineId: string) {
-    const approvedReceipts = await prisma.receipt.findMany({
+    // Fetch FIRST 10 receipts by upload time (regardless of status)
+    const first10Receipts = await prisma.receipt.findMany({
       where: {
         lineId,
-        status: 'approved',
       },
       orderBy: { uploadedAt: 'asc' },
+      take: 10,
     });
+
+    // Filter to only approved receipts within those first 10
+    const approvedReceipts = first10Receipts.filter(r => r.status === 'approved');
 
     let totalPoints = 0;
     let slotsUsed = 0;
@@ -418,39 +423,48 @@ export class AdminService {
     const GOLD_THRESHOLD = 3500;
     const TZ = 'Asia/Bangkok';
 
-    const receiptsToday = await prisma.receipt.findMany({
+    // Take FIRST 3 receipts uploaded today (by upload time), regardless of status
+    const first3Uploaded = await prisma.receipt.findMany({
       where: {
         lineId,
         uploadedAt: {
           gte: moment(date).tz(TZ).startOf('day').toDate(),
           lte: moment(date).tz(TZ).endOf('day').toDate(),
         },
-        status: 'approved',
       },
       orderBy: { uploadedAt: 'asc' },
       take: 3,
     });
 
-    let totalMovie = 0;
-    let totalGold = 0;
+    // Filter to only approved receipts within those first 3
+    const first3Receipts = first3Uploaded.filter(r => r.status === 'approved');
+
     const EXCLUDED_CATEGORIES_GOLD = ['BU', 'GOLD_JEWELRY', 'BEAUTY_CLINIC', 'EDUCATION', 'IT_GADGET'];
     const EXCLUDED_CATEGORIES_MOVIE = [...EXCLUDED_CATEGORIES_GOLD, 'FOOD'];
 
-    for (const r of receiptsToday) {
+    let totalMovie = 0;
+    let totalGold = 0;
+    const lockedReceiptIds: number[] = [];
+
+    // Process only these first 3 receipts
+    for (const r of first3Receipts) {
       const store: any = await prisma.store.findFirst({
         where: { storeName: r.storeName, branchId: r.branchId },
       });
       const isParticipating = store?.isParticipating !== false;
       const category = store?.category || 'GENERAL';
 
-      // Movie Total: Excludes Food + others
-      if (isParticipating && !EXCLUDED_CATEGORIES_MOVIE.includes(category)) {
-        totalMovie += Number(r.amount);
-      }
+      const amount = Number(r.amount);
+      const isMovieContrib = isParticipating && !EXCLUDED_CATEGORIES_MOVIE.includes(category);
+      const isGoldContrib = isParticipating && !EXCLUDED_CATEGORIES_GOLD.includes(category);
 
-      // Gold Total: Includes Food, excludes others
-      if (isParticipating && !EXCLUDED_CATEGORIES_GOLD.includes(category)) {
-        totalGold += Number(r.amount);
+      // Only count valid receipts toward totals
+      if (isMovieContrib) totalMovie += amount;
+      if (isGoldContrib) totalGold += amount;
+
+      // Lock only valid receipts (ones that actually contributed)
+      if (isMovieContrib || isGoldContrib) {
+        lockedReceiptIds.push(r.receiptId);
       }
     }
 
@@ -468,6 +482,18 @@ export class AdminService {
     const redeemRights = (eligibleMovie || eligibleGold) ? 1 : 0;
 
     if (existingDaily) {
+      // If user has already redeemed, DO NOT update eligibility flags or the "locked" receipt list.
+      // This allows new receipts to be approved (for Top Spender) without getting locked into the redemption set.
+      if ((existingDaily as any).usedRights > 0) {
+        return await prisma.dailyRedemptionRight.update({
+          where: { id: existingDaily.id },
+          data: {
+            totalSpent: dailyTotal,
+            updatedAt: new Date(),
+          } as any,
+        });
+      }
+
       return await prisma.dailyRedemptionRight.update({
         where: { id: existingDaily.id },
         data: {
@@ -477,7 +503,7 @@ export class AdminService {
           eligibleGoldA: eligibleGold,
           eligibleGoldB: eligibleGold,
           updatedAt: new Date(),
-          receiptIds: receiptsToday.map(r => r.receiptId).join(','),
+          receiptIds: lockedReceiptIds.join(','),
         } as any,
       });
     } else {
@@ -490,7 +516,7 @@ export class AdminService {
           eligibleMovie,
           eligibleGoldA: eligibleGold,
           eligibleGoldB: eligibleGold,
-          receiptIds: receiptsToday.map(r => r.receiptId).join(','),
+          receiptIds: lockedReceiptIds.join(','),
           branchId: branchId || null,
           branchName: branchName || null,
         } as any,
@@ -547,7 +573,10 @@ export class AdminService {
         });
 
         if (dailyRecord && (dailyRecord as any).usedRights > 0 && newStatus !== 'approved') {
-          throw new ConflictException('ไม่สามารถแก้ไขสถานะใบเสร็จได้ เนื่องจากผู้ใช้ได้ใช้สิทธิ์แลกรางวัลของวันนี้ไปแล้ว');
+          const usedReceiptIds = String((dailyRecord as any).receiptIds || '').split(',').map(id => id.trim());
+          if (usedReceiptIds.includes(String(receiptId))) {
+            throw new ConflictException('ไม่สามารถแก้ไขสถานะใบเสร็จได้ เนื่องจากใบเสร็จนี้ถูกใช้สำหรับการแลกรางวัลของวันนี้ไปแล้ว');
+          }
         }
 
         if (newStatus === 'approved') {
@@ -1540,6 +1569,7 @@ export class AdminService {
 
   async exportClaimedHist(query: {
     branchId?: string;
+    rewardId?: string;
     startDate?: string;
     endDate?: string;
     phone?: string;
@@ -1562,6 +1592,14 @@ export class AdminService {
 
       if (query.phone) {
         filters.phone = { startsWith: query.phone };
+      }
+
+      if (query.branchId) {
+        filters.branchId = query.branchId;
+      }
+
+      if (query.rewardId) {
+        filters.redeemId = query.rewardId;
       }
 
       // Fetch data from database
@@ -1609,9 +1647,11 @@ export class AdminService {
         // Map redeemId to product name
         let productName = '';
         if (claimedList.redeemId === 'redeem001') {
-          productName = 'บัตรชมภายนต์';
-        } else if (claimedList.redeemId === 'redeem002') {
-          productName = 'Gift Voucher 100 Baht';
+          productName = 'บัตรชมภาพยนตร์ 2 ใบ';
+        } else if (claimedList.redeemId === 'redeem003') {
+          productName = 'ส่วนลดค่ากำเหน็จ 40%';
+        } else if (claimedList.redeemId === 'redeem004') {
+          productName = 'ส่วนลดค่ากำเหน็จ 500.-';
         } else {
           productName = claimedList.redeemId;
         }
@@ -1635,6 +1675,54 @@ export class AdminService {
       return buffer;
     } catch (error) {
       this.logger.error(error, ':exportClaimedHist');
+    }
+  }
+
+  async addStoresBulk(branchId: string, stores: AddStoreDto[]) {
+    // Validate branch exists
+    const branch = await this.prisma.branch.findUnique({
+      where: { branchId },
+    });
+    if (!branch) throw new NotFoundException(`ไม่พบสาขาหมายเลข ${branchId}`);
+
+    const data = stores.map((s) => ({
+      storeName: s.storeName,
+      branchId,
+      category: s.category || 'GENERAL',
+      isParticipating: s.isParticipating !== undefined ? s.isParticipating : true,
+      isStoreEnable: s.isStoreEnable !== undefined ? s.isStoreEnable : true,
+    }));
+
+    const result = await this.prisma.store.createMany({
+      data,
+      skipDuplicates: true,
+    });
+
+    this.logger.log(`Added ${result.count} stores to branch ${branchId}: addStoresBulk`);
+    return result;
+  }
+
+  async uploadStoresExcel(branchId: string, file: any) {
+    try {
+      const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
+
+      const stores: AddStoreDto[] = jsonData.map((row) => ({
+        storeName: String(row.storeName || row['Store Name'] || row['ชื่อร้าน'] || '').trim(),
+        category: String(row.category || row['Category'] || row['หมวดหมู่'] || 'GENERAL').trim(),
+        isParticipating: row.isParticipating === 'false' || row['isParticipating'] === false ? false : true,
+        isStoreEnable: true,
+      })).filter(s => s.storeName);
+
+      if (stores.length === 0) {
+        throw new BadRequestException('ไม่พบข้อมูลร้านค้าในไฟล์ Excel หรือรูปแบบไม่ถูกต้อง');
+      }
+
+      return await this.addStoresBulk(branchId, stores);
+    } catch (error) {
+      this.logger.error(error, ':uploadStoresExcel');
+      throw error;
     }
   }
 }

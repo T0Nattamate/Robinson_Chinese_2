@@ -33,12 +33,15 @@ const TermsFileUpload = () => {
   return (
     <div className="font-kanit bg-[var(--bg)] w-full min-h-screen flex flex-col items-center relative">
       {/* Header image container */}
-      <div className="w-full bg-white md:w-96 flex items-center justify-center">
+      {/* <div className="w-full bg-white md:w-96 flex items-center justify-center">
         <img
           src="//banner_major.webp"
           alt="header1page"
           className="w-full object-contain"
         />
+      </div> */}
+      <div className="w-full h-full min-h-[400px] md:w-96 relative bg-white">
+        <img src="//banner_major.webp" alt="header1page" className="w-full" />
       </div>
 
       {/* Overlay behind the card */}
@@ -58,7 +61,7 @@ const TermsFileUpload = () => {
           </div>
         </div>
 
-        <h1 className="flex flex-row text-xl mt-16 text-black py-2 w-full relative ">
+        <h1 className="flex flex-row text-md mt-16 text-black py-2 w-full relative ">
           <p className="px-8 text-start"> รายละเอียด  </p>
           <p className="text-center"> | </p>
           <p className="px-5 text-end"> กำหนด เงื่อนไข </p>

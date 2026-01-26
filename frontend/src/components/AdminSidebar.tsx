@@ -6,7 +6,7 @@ import { IoBarChartOutline } from "react-icons/io5";
 //import { GoTrophy } from "react-icons/go";
 import { GoPencil } from "react-icons/go";
 import { BsTruck } from "react-icons/bs";
-import { PiGear, PiUserListLight } from "react-icons/pi";
+import { PiGear, PiUserListLight, PiStorefront } from "react-icons/pi";
 import { MdOutlineKeyboardDoubleArrowLeft } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useAdminStore } from "../store/AdminStore";
@@ -44,9 +44,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   //console.log("isSuperadmin", isSuperAdmin);
   return (
     <div
-      className={`fixed top-0 left-0 h-full w-64  transition-transform duration-300 z-40 ${
-        isSidebarOpen ? "translate-x-0 w-64" : "-translate-x-80"
-      }`}
+      className={`fixed top-0 left-0 h-full w-64  transition-transform duration-300 z-40 ${isSidebarOpen ? "translate-x-0 w-64" : "-translate-x-80"
+        }`}
     >
       <Sidebar className="h-[calc(100vh-2rem)] min-h-screen w-full max-w-[16rem] shadow-xl shadow-blue-gray-900/5 bg-[white]">
         <div
@@ -58,7 +57,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           <MdOutlineKeyboardDoubleArrowLeft size={25} />
         </div>
         <div className="w-full  h-32 mt-14 relative flex items-center justify-center">
-        <img
+          <img
             src="/logo.png"
             alt="robinson campaign logo"
             className="w-[89%]"
@@ -154,6 +153,16 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             </MenuItem>
           )}
 
+          {isSuperAdmin === false && (
+            <MenuItem
+              icon={<PiStorefront />}
+              component={<Link to="/admin/dashboard/add-store" />}
+            >
+              {" "}
+              {isSidebarOpen && "จัดการร้านค้า"}
+            </MenuItem>
+          )}
+
           {isSuperAdmin === true && (
             <>
               <MenuItem
@@ -205,7 +214,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </MenuItem>
         </Menu>
       </Sidebar>
-    </div>
+    </div >
   );
 };
 

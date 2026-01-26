@@ -190,8 +190,8 @@ const RedeemPage = () => {
   return (
     <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative pb-10">
       {isLoading && <LoadingOverlay />}
-      <div className="w-full bg-white md:w-96">
-        <img src="Poster black friday  50x70cm_SF.jpg" alt="header1page" className="w-full" />
+      <div className="w-full h-full min-h-[400px] md:w-96 relative bg-white">
+        <img src="//banner_major.webp" alt="header1page" className="w-full" />
       </div>
 
       <div className="flex flex-col justify-start items-center w-[90%] md:w-96 mt-8 text-center gap-6">
@@ -200,6 +200,15 @@ const RedeemPage = () => {
         </h1>
 
         <div className="flex flex-col gap-4 w-full">
+          {usedMovie || usedGold ? (
+            <div className="text-lg border border-[var(--text)] p-2 rounded-lg bg-white text-yellow-600" >
+              คุณใช้สิทธิ์แลกรับของรางวัลประจำวันแล้ว
+            </div>
+          ) : (
+            <div className="text-lg border border-[var(--text)] p-2 rounded-lg bg-white" >
+              สิทธิ์แลกรับของรางวัล:  {rights} สิทธิ์
+            </div>
+          )}
           {/* Category Selection */}
           <div className="flex flex-col gap-4">
             {/* Movie Reward Item */}
@@ -281,13 +290,13 @@ const RedeemPage = () => {
           )}
         </div>
 
-        {currentReward && (
+        {/* {currentReward && (
           <div className="bg-white py-3 px-6 rounded-full inline-flex justify-center items-center shadow-lg w-full max-w-xs transition-all">
             <p className="text-lg text-black">
               คุณมีสิทธิ์แลก: <span className="font-bold">{rights}</span> สิทธิ์
             </p>
           </div>
-        )}
+        )} */}
 
         {currentReward ? (
           <div className="mt-2 flex justify-center items-center w-full animate-in fade-in duration-500">

@@ -304,14 +304,14 @@ export class UserService {
   // Get top spenders
   async getTopSpender() {
     try {
-      // Fetch top 15 users ordered by accumulatedAmount
+      // Fetch top 14 users ordered by accumulatedAmount
       const topUsers = await this.prisma.user.findMany({
         where: {
           accPoints: {
             gte: 20000,
           },
         },
-        take: 15,
+        take: 14,
         orderBy: {
           accPoints: 'desc',
         },

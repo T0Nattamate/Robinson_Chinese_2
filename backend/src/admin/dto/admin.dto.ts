@@ -45,6 +45,7 @@ export class UpdateAdminDto {
   adminId: string;
 
   @IsOptional()
+  @IsString()
   branchId?: string;
 
   @IsOptional()
@@ -54,4 +55,31 @@ export class UpdateAdminDto {
   @IsOptional()
   @IsBoolean()
   isEnable?: boolean;
+}
+
+export class AddStoreDto {
+  @IsString()
+  @IsNotEmpty()
+  storeName: string;
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isParticipating?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isStoreEnable?: boolean;
+}
+
+export class AddStoresBulkDto {
+  @IsString()
+  @IsNotEmpty()
+  branchId: string;
+
+  @IsNotEmpty()
+  stores: AddStoreDto[];
 }

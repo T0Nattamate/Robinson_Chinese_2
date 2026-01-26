@@ -87,11 +87,11 @@ const AdminLoginPage = () => {
       {isLoading && <LoadingOverlay />}
       <div className="hidden  lg:w-full h-full min-h-screen bg-cover bg-center lg:flex items-center justify-center bg-[var(--bg)]"
         style={{
-          backgroundImage: `url('/header.jpg')`,backgroundPosition: "center 10rem" 
+          backgroundImage: `url('/header.jpg')`, backgroundPosition: "center 10rem"
         }}
       >
         <img
-          src="/banner_cut.webp"
+          src="//banner_cut.webp"
           alt="robinsonlogo"
           className="w-full h-full rounded-2xl"
         />

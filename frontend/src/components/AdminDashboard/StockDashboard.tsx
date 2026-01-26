@@ -24,8 +24,9 @@ const StockDashboard = () => {
 
   //default item
   const knownItems = [
-    { redeemId: "redeem001", label: "Movie Ticket" },
-    { redeemId: "redeem002", label: "Give Voucher" },
+    { redeemId: "redeem001", label: "บัตรชมภาพยนตร์ 2 ใบ" },
+    { redeemId: "redeem003", label: "ส่วนลดค่ากำเหน็จ 40%" },
+    { redeemId: "redeem004", label: "ส่วนลดค่ากำเหน็จ 500.-" },
   ];
 
   // stock dialog
@@ -161,19 +162,20 @@ const StockDashboard = () => {
           <section className="flex flex-wrap gap-3 mt-5">
             {stockData && stockData.length > 0 ? (
               stockData.map((item) => {
-                // If redeemId === "redeem001", show "SUMMER BAG"; otherwise, fallback to branchName
-                // or you could do: item.redeemId === "redeem001" ? "SUMMER BAG" : item.redeemId
-                const itemName = item.redeemId === "redeem001" ? "Movie Ticket" : item.redeemId || item.redeemId === "redeem002" ? "Gift Voucher" : item.redeemId;
+                const itemName =
+                  item.redeemId === "redeem001" ? "บัตรชมภาพยนตร์ 2 ใบ" :
+                    item.redeemId === "redeem003" ? "ส่วนลดค่ากำเหน็จ 40%" :
+                      item.redeemId === "redeem004" ? "ส่วนลดค่ากำเหน็จ 500.-" :
+                        item.redeemId;
 
 
                 return (
                   <div
                     key={`${item.redeemId}-${item.branchStockId}`}
-                    className={`${
-                      item.redeemId === "redeem001"
-                        ? "bg-white text-black"
-                        : "bg-white text-black"
-                    } rounded-xl w-72 h-40 p-7 flex flex-col gap-3 relative`}
+                    className={`${item.redeemId === "redeem001"
+                      ? "bg-white text-black"
+                      : "bg-white text-black"
+                      } rounded-xl w-72 h-40 p-7 flex flex-col gap-3 relative`}
                   >
                     <h1 className="text-xl">{itemName}</h1>
                     {item.isEnable ? (
@@ -247,8 +249,12 @@ const StockDashboard = () => {
                         </td>
                         <td className="w-20 border-b border-b-slate-400 pb-3 h-10 pt-2">
                           {transaction.redeemId === "redeem001"
-                            ? "Movie Ticket"
-                            : "Gift Voucher"}
+                            ? "บัตรชมภาพยนตร์ 2 ใบ"
+                            : transaction.redeemId === "redeem003"
+                              ? "ส่วนลดค่ากำเหน็จ 40%"
+                              : transaction.redeemId === "redeem004"
+                                ? "ส่วนลดค่ากำเหน็จ 500.-"
+                                : transaction.redeemId}
                         </td>
                         <td className=" border-b border-b-slate-400 flex flex-col justify-center items-center text-center pb-3 h-10 pt-2">
                           {/* Case 1: Only amount changed */}
@@ -265,8 +271,8 @@ const StockDashboard = () => {
                           {transaction.updatedStatus && (
                             <div className="flex gap-2 flex-col justify-center items-center text-center">
                               <span>
-                              เปลี่ยนแปลงจำนวนในคลัง{" "}
-                              {formatNumber(transaction.amount)}
+                                เปลี่ยนแปลงจำนวนในคลัง{" "}
+                                {formatNumber(transaction.amount)}
                               </span>
                               <span>ปรับเปลี่ยนสถานะเป็น{" "}</span>
                               {translateBoolean(transaction.isEnable)}
