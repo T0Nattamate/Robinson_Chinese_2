@@ -18,9 +18,9 @@ export interface Store {
   storeId: string;
   storeName: string;
   branchId: string;
+  category: string;
+  isParticipating: boolean;
   isStoreEnable: boolean;
-  canLuckydraw: boolean;
-  canBag: boolean;
 }
 
 /**
@@ -40,10 +40,6 @@ export interface Branch {
   branchId: string;
   branchName: string;
   isBranchEnable: boolean;
-  canVip: boolean;
-  vipPoint: string | number;   // can be a string in the response
-  canHokkaido?: boolean;       // optional if not always present
-  canBag?: boolean;            // optional if not always present
   stores: Store[];
 }
 

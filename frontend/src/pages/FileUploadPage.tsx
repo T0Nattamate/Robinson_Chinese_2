@@ -51,7 +51,11 @@ import useBranchStore from "../store/BranchStore";
 interface Errors {
   file?: string | null;
 }
-
+interface StoreOption {
+  storeName: string;      // Original: "Nike" (sent to API)
+  displayName: string;    // Display: "Nike (Sport)" (shown in dropdown)
+  category?: string;      // Category: "Sport"
+}
 const FileUploadPage = () => {
   const { branches } = useBranchStore();
   const navigate = useNavigate();
@@ -77,10 +81,17 @@ const FileUploadPage = () => {
   // Store logic
   //const [haveOtherStore, setHaveOtherStore] = useState(false);
   const [otherStoreName, setOtherStoreName] = useState("");
-  const [stores, setStores] = useState<string[]>([]);
+  const [stores, setStores] = useState<StoreOption[]>([]);
+  const [selectedStore, setSelectedStore] = useState<StoreOption | null>(null);
   const [query, setQuery] = useState("");
-  const [selectedStore, setSelectedStore] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+
+  const createDisplayName = (storeName: string, category?: string): string => {
+    if (category && category.trim()) {
+      return `${storeName} (${category})`;  // "Nike (Sport)"
+    }
+    return storeName;  // "Nike" if no category
+  };
   // Errors
   const [error, setError] = useState<Errors>({});
 
@@ -108,6 +119,66 @@ const FileUploadPage = () => {
   }
 
   // Called when user picks a branch from the branch combobox
+  // const handleBranchChange = (selectedBranchName: string) => {
+  //   const selectedBranch = branches.find(
+  //     (branch) => branch.branchName === selectedBranchName
+  //   );
+
+  //   if (!selectedBranch) {
+  //     console.warn("Branch not found:", selectedBranchName);
+  //     return;
+  //   }
+
+  //   setBranchName(selectedBranch.branchName);
+
+  //   // console.log("=== DEBUG: Store Deduplication ===");
+  //   // console.log("Branch:", selectedBranch.branchName);
+  //   // console.log("Total stores in branch:", selectedBranch.stores?.length);
+
+  //   const enabledStores = selectedBranch.stores?.filter((store) => store.isStoreEnable) || [];
+  //   //console.log("Enabled stores:", enabledStores.length);
+
+  //   const storeNames = enabledStores.map((store) => store.storeName.trim());
+  //   //console.log("All store names:", storeNames);
+
+  //   // Find duplicates
+  //   const storeCount: { [key: string]: number } = {};
+  //   storeNames.forEach((name) => {
+  //     storeCount[name] = (storeCount[name] || 0) + 1;
+  //   });
+
+  //   // const duplicates = Object.entries(storeCount)
+  //   //   .filter(([_, count]) => count > 1)
+  //   //   .map(([name, count]) => ({ name, count }));
+
+  //   // if (duplicates.length > 0) {
+  //   //   //console.log("🔴 DUPLICATES FOUND:");
+  //   //   duplicates.forEach(({ name, count }) => {
+  //   //     //console.log(`  - "${name}" appears ${count} times`);
+  //   //   });
+
+  //   //   // Show which store IDs have duplicate names
+  //   //   duplicates.forEach(({ name }) => {
+  //   //     const duplicateStores = enabledStores.filter(
+  //   //       (store) => store.storeName.trim() === name
+  //   //     );
+  //   //     //console.log(`  📍 Store "${name}" - IDs:`, duplicateStores.map(s => s.storeId));
+  //   //   });
+  //   // } else {
+  //   //   //console.log("✅ No duplicates found");
+  //   // }
+
+  //   const uniqueStores = [...new Set(storeNames)];
+  //   //console.log("Unique stores:", uniqueStores);
+  //   //console.log("Total removed duplicates:", storeNames.length - uniqueStores.length);
+
+  //   uniqueStores.sort((a, b) => a.localeCompare(b, 'th'));
+
+  //   setStores(uniqueStores);
+  //   setSelectedStore("");
+  //   setQuery("");
+  //   setOtherStoreName("");
+  // };
   const handleBranchChange = (selectedBranchName: string) => {
     const selectedBranch = branches.find(
       (branch) => branch.branchName === selectedBranchName
@@ -120,51 +191,28 @@ const FileUploadPage = () => {
 
     setBranchName(selectedBranch.branchName);
 
-    // console.log("=== DEBUG: Store Deduplication ===");
-    // console.log("Branch:", selectedBranch.branchName);
-    // console.log("Total stores in branch:", selectedBranch.stores?.length);
-
     const enabledStores = selectedBranch.stores?.filter((store) => store.isStoreEnable) || [];
-    //console.log("Enabled stores:", enabledStores.length);
 
-    const storeNames = enabledStores.map((store) => store.storeName.trim());
-    //console.log("All store names:", storeNames);
+    // Create StoreOption objects with displayName including category
+    const storeOptions: StoreOption[] = enabledStores.map((store) => ({
+      storeName: store.storeName.trim(),
+      category: store.category?.trim() || "",
+      displayName: createDisplayName(store.storeName.trim(), store.category?.trim()),
+    }));
 
-    // Find duplicates
-    const storeCount: { [key: string]: number } = {};
-    storeNames.forEach((name) => {
-      storeCount[name] = (storeCount[name] || 0) + 1;
+    // Remove duplicates based on displayName
+    const uniqueStoresMap = new Map<string, StoreOption>();
+    storeOptions.forEach((store) => {
+      if (!uniqueStoresMap.has(store.displayName)) {
+        uniqueStoresMap.set(store.displayName, store);
+      }
     });
 
-    // const duplicates = Object.entries(storeCount)
-    //   .filter(([_, count]) => count > 1)
-    //   .map(([name, count]) => ({ name, count }));
-
-    // if (duplicates.length > 0) {
-    //   //console.log("🔴 DUPLICATES FOUND:");
-    //   duplicates.forEach(({ name, count }) => {
-    //     //console.log(`  - "${name}" appears ${count} times`);
-    //   });
-
-    //   // Show which store IDs have duplicate names
-    //   duplicates.forEach(({ name }) => {
-    //     const duplicateStores = enabledStores.filter(
-    //       (store) => store.storeName.trim() === name
-    //     );
-    //     //console.log(`  📍 Store "${name}" - IDs:`, duplicateStores.map(s => s.storeId));
-    //   });
-    // } else {
-    //   //console.log("✅ No duplicates found");
-    // }
-
-    const uniqueStores = [...new Set(storeNames)];
-    //console.log("Unique stores:", uniqueStores);
-    //console.log("Total removed duplicates:", storeNames.length - uniqueStores.length);
-
-    uniqueStores.sort((a, b) => a.localeCompare(b, 'th'));
+    const uniqueStores = Array.from(uniqueStoresMap.values());
+    uniqueStores.sort((a, b) => a.displayName.localeCompare(b.displayName, 'th'));
 
     setStores(uniqueStores);
-    setSelectedStore("");
+    setSelectedStore(null);
     setQuery("");
     setOtherStoreName("");
   };
@@ -178,13 +226,23 @@ const FileUploadPage = () => {
       );
 
       if (selectedBranch) {
-        // Same deduplication logic
-        const storeNames = selectedBranch.stores
-          ?.filter((store) => store.isStoreEnable)
-          ?.map((store) => store.storeName.trim()) || [];
+        const enabledStores = selectedBranch.stores?.filter((store) => store.isStoreEnable) || [];
 
-        const uniqueStores = [...new Set(storeNames)];
-        uniqueStores.sort((a, b) => a.localeCompare(b, 'th'));
+        const storeOptions: StoreOption[] = enabledStores.map((store) => ({
+          storeName: store.storeName.trim(),
+          category: store.category?.trim() || "",
+          displayName: createDisplayName(store.storeName.trim(), store.category?.trim()),
+        }));
+
+        const uniqueStoresMap = new Map<string, StoreOption>();
+        storeOptions.forEach((store) => {
+          if (!uniqueStoresMap.has(store.displayName)) {
+            uniqueStoresMap.set(store.displayName, store);
+          }
+        });
+
+        const uniqueStores = Array.from(uniqueStoresMap.values());
+        uniqueStores.sort((a, b) => a.displayName.localeCompare(b.displayName, 'th'));
 
         setStores(uniqueStores);
       } else {
@@ -197,19 +255,20 @@ const FileUploadPage = () => {
   const filteredStores =
     query === ""
       ? [...stores]
-      : [
-        ...stores.filter((store) =>
-          store.toLowerCase().includes(query.toLowerCase())
-        ),
-      ];
+      : stores.filter((store) =>
+        store.displayName.toLowerCase().includes(query.toLowerCase())
+      );
 
-  const handleStoreChange = (store: string) => {
+  // const handleStoreChange = (store: string) => {
+  //   setSelectedStore(store);
+  //   // if (store === "อื่นๆ") {
+  //   //   setHaveOtherStore(true);
+  //   // } else {
+  //   //   setHaveOtherStore(false);
+  //   // }
+  // };
+  const handleStoreChange = (store: StoreOption | null) => {
     setSelectedStore(store);
-    // if (store === "อื่นๆ") {
-    //   setHaveOtherStore(true);
-    // } else {
-    //   setHaveOtherStore(false);
-    // }
   };
 
   // 3) AMOUNT (Up to 2 decimals, with commas)
@@ -372,8 +431,9 @@ const FileUploadPage = () => {
       }
 
       // Check store
-      const store = branchObj.stores.find((s) => s.storeName === selectedStore);
-      const storeNameToSend = store ? store.storeName : otherStoreName;
+      // const store = branchObj.stores.find((s) => s.storeName === selectedStore);
+      // const storeNameToSend = store ? store.storeName : otherStoreName;
+      const storeNameToSend = selectedStore?.storeName || otherStoreName;
 
       // Build FormData
       const requestBody = new FormData();
@@ -510,7 +570,7 @@ const FileUploadPage = () => {
           </section>
 
           {/* Store Combobox */}
-          {branchName && (
+          {/* {branchName && (
             <section className="flex-col flex gap-5 w-full rounded-lg mt-2">
               <Combobox
                 value={selectedStore}
@@ -583,10 +643,51 @@ const FileUploadPage = () => {
                     </FieldError>
                   </div>
                 </TextField>
-              )} */}
+              )} 
+            </section>
+          )} */}
+          {branchName && (
+            <section className="flex-col flex gap-5 w-full rounded-lg mt-2">
+              <Combobox
+                value={selectedStore}
+                onChange={(store: StoreOption | null) => handleStoreChange(store)}
+                onClose={() => setQuery("")}
+              >
+                <Label className="text-start text-sm ml-2 text-[var(--text)]">
+                  *ร้านค้าที่ร่วมรายการ
+                </Label>
+                <div className="relative w-full -mt-4">
+                  <ComboboxInput
+                    className="flex font-light relative w-full text-sm cursor-default rounded-lg bg-white border-slate-300 border h-10 data-[pressed]:bg-opacity-100 transition py-2 pl-5 pr-2 text-left text-gray-700 focus:outline-none data-[focus-visible]:border-indigo-500 data-[focus-visible]:ring-2 data-[focus-visible]:ring-black"
+                    placeholder="*ร้านค้าที่ร่วมรายการ"
+                    displayValue={(store: StoreOption | null) => store?.displayName || ""}
+                    onChange={(event) => setQuery(event.target.value)}
+                  />
+                  <ComboboxButton className="p-2 absolute right-2 top-0">
+                    <MdKeyboardArrowDown size={24} className="text-black" />
+                  </ComboboxButton>
+                  <ComboboxOptions
+                    anchor="bottom"
+                    transition
+                    className={clsx(
+                      "w-[var(--input-width)] rounded-md border border-black/5 bg-white drop-shadow-md p-1 empty:invisible",
+                      "transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0 z-50 max-h-60 overflow-y-auto"
+                    )}
+                  >
+                    {filteredStores.map((store) => (
+                      <ComboboxOption
+                        key={store.displayName}
+                        value={store}
+                        className="group flex items-center gap-2 rounded-md py-1.5 px-3 select-none data-[focus]:bg-white/3 cursor-pointer hover:bg-gray-300 duration-200 text-slate-600 hover:text-black font-kanit font-light"
+                      >
+                        <div className="p-1 pl-7">{store.displayName}</div>
+                      </ComboboxOption>
+                    ))}
+                  </ComboboxOptions>
+                </div>
+              </Combobox>
             </section>
           )}
-
           {/* Date Picker */}
           <DatePicker
             isRequired

@@ -106,8 +106,8 @@ const ReceiptDashboard = () => {
     query === ""
       ? branches
       : branches.filter((b) =>
-          b.branchName.toLowerCase().includes(query.toLowerCase())
-        );
+        b.branchName.toLowerCase().includes(query.toLowerCase())
+      );
 
   // Date filter
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
@@ -566,7 +566,7 @@ const ReceiptDashboard = () => {
           icon: <FaCircleXmark size={14} className="text-red-600" />,
           textTH: "ใบเสร็จซ้ำกับใบที่อนุมัติแล้ว",
           textEN: "This receipt has already approved.",
-      };
+        };
 
       default:
         return null;
