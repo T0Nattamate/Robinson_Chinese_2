@@ -141,7 +141,7 @@ export class AdminService {
       this.logger.log(`Updated secret key to admin "${secret}": adminLogin`);
 
       //genrate to url
-      const otpUrl = authenticator.keyuri(username, 'Robinson Celebration', secret);
+      const otpUrl = authenticator.keyuri(username, 'Robinson CNY 2026', secret);
       this.logger.log(`OTP URL: "${otpUrl}": adminLogin`);
 
       //convert url to qr code

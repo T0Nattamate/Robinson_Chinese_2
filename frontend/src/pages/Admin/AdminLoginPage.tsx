@@ -105,7 +105,7 @@ const AdminLoginPage = () => {
             Admin Login
           </h1>
           <h1 className="w-full md:text-start text-sm font-semibold font-poppins text-slate-400 mt-2 mb-8">
-            Robinson Celebration Campaign
+            Robinson CNY 2026
           </h1>
           <TextField
             isRequired
