@@ -11,8 +11,8 @@ const MenuPage = () => {
 
   // Define promotion periods (Bangkok timezone)
   const PROMOTION_PERIODS = [
-    //{ start: new Date('2026-02-02T00:00:00+07:00'), end: new Date('2026-02-24T23:59:59+07:00') }, //prod
-    { start: new Date('2026-01-20T00:00:00+07:00'), end: new Date('2026-02-02T23:59:59+07:00') }, //test
+    { start: new Date('2026-02-02T00:00:00+07:00'), end: new Date('2026-02-24T23:59:59+07:00') }, //prod
+    //{ start: new Date('2026-01-20T00:00:00+07:00'), end: new Date('2026-02-02T23:59:59+07:00') }, //test
   ];
 
   // Check if current date is within promotion period
