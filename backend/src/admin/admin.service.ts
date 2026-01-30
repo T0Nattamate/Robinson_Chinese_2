@@ -540,8 +540,8 @@ export class AdminService {
 
         // Promotion periods check
         const PROMOTION_PERIODS_BKK = [
-          //{ start: new Date('2026-02-02T00:00:00+07:00'), end: new Date('2026-02-24T23:59:59+07:00') }, //prod
-          { start: new Date('2026-01-20T00:00:00+07:00'), end: new Date('2026-02-02T23:59:59+07:00') }, //test
+          { start: new Date('2026-02-02T00:00:00+07:00'), end: new Date('2026-02-24T23:59:59+07:00') }, //prod
+          //{ start: new Date('2026-01-20T00:00:00+07:00'), end: new Date('2026-02-02T23:59:59+07:00') }, //test
         ];
         const inAnyPromotionPeriodBkk = (d: Date) => {
           const m = toBkk(d).startOf('day');

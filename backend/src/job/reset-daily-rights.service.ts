@@ -10,8 +10,8 @@ export class ResetDailyRightsService {
 
   // promotion perioods
   private readonly PROMOTION_PERIODS_BKK: Array<{ start: moment.Moment; end: moment.Moment }> = [
-    //{ start: moment.tz('2026-02-02T00:00:00+07:00', this.TZ), end: moment.tz('2026-02-24T23:59:59+07:00', this.TZ) }, //prod
-    { start: moment.tz('2026-01-20T00:00:00+07:00', this.TZ), end: moment.tz('2026-02-02T23:59:59+07:00', this.TZ) }, //test
+    { start: moment.tz('2026-02-02T00:00:00+07:00', this.TZ), end: moment.tz('2026-02-24T23:59:59+07:00', this.TZ) }, //prod
+    //{ start: moment.tz('2026-01-20T00:00:00+07:00', this.TZ), end: moment.tz('2026-02-02T23:59:59+07:00', this.TZ) }, //test
   ];
 
   constructor(private readonly prisma: PrismaService) { }
