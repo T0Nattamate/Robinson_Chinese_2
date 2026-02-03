@@ -57,7 +57,7 @@ function censorString(str: string) {
 }
 
 const AnnouncementPage = () => {
-  const [announcements ] = useState<Winner[]>([]);
+  const [announcements] = useState<Winner[]>([]);
 
   // On component mount, use the mock data
   useEffect(() => {
@@ -65,14 +65,14 @@ const AnnouncementPage = () => {
   }, []);
 
   return (
-    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative  ">
+    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative animate-in fade-in duration-700">
       <div className="w-full h-full bg-white md:w-96 ">
         <img src="/header.png" alt="header1page" className="w-full" />
       </div>
       <h1 className="text-3xl pt-10 relative text-[var(--text)] text-center">ประกาศรายชื่อผู้โชคดี<br></br>
-    
+
       </h1>
-      <h2 className="text-xl pb-10 relative text-[var(--text)] text-center"> 
+      <h2 className="text-xl pb-10 relative text-[var(--text)] text-center">
         รับคะแนนเดอะวัน รวม 1 ล้านคะแนน <br></br>
         (รางวัลละ 250,000 คะแนน, จำนวน 4 รางวัล)
       </h2>

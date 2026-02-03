@@ -518,7 +518,7 @@ const FileUploadPage = () => {
   }, []);
 
   return (
-    <div className="font-kanit bg-[var(--bg)] w-full h-full min-h-screen flex flex-col justify-center items-center relative">
+    <div className="font-kanit bg-[var(--bg)] w-full h-full min-h-screen flex flex-col justify-center items-center relative animate-in fade-in slide-in-from-bottom-4 duration-700">
       {isLoading && <LoadingOverlay />}
 
       {/* Header */}

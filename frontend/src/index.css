@@ -6,6 +6,60 @@
 
 @theme {
   --font-kanit: "Kanit", "sans-serif";
+
+  --animate-in: enter var(--animate-duration, 600ms) ease-out backwards;
+
+  @keyframes enter {
+    from {
+      opacity: var(--tw-enter-opacity, 1);
+      transform: scale(var(--tw-enter-scale, 1)) translate(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0));
+    }
+  }
+}
+
+/* Compositional Utilities for animate-in */
+.fade-in {
+  --tw-enter-opacity: 0 !important;
+}
+
+.zoom-in {
+  --tw-enter-scale: 0.95 !important;
+}
+
+.zoom-in-95 {
+  --tw-enter-scale: 0.95 !important;
+}
+
+.slide-in-from-bottom {
+  --tw-enter-translate-y: 1.5rem !important;
+}
+
+.slide-in-from-bottom-4 {
+  --tw-enter-translate-y: 1rem !important;
+}
+
+.slide-in-from-bottom-5 {
+  --tw-enter-translate-y: 1.25rem !important;
+}
+
+.slide-in-from-right {
+  --tw-enter-translate-x: 2rem !important;
+}
+
+.slide-in-from-left {
+  --tw-enter-translate-x: -2rem !important;
+}
+
+.duration-600 {
+  --animate-duration: 600ms !important;
+}
+
+.duration-700 {
+  --animate-duration: 700ms !important;
+}
+
+.duration-1000 {
+  --animate-duration: 1000ms !important;
 }
 
 

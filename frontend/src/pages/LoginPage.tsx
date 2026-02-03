@@ -13,7 +13,7 @@ const LoginPage = () => {
       setLineProfilePic(
         "https://ih1.redbubble.net/image.5448836884.7313/bg,f8f8f8-flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
       );
-      
+
       try {
         await confirmLoginWithLineId(lineIdFromInput);
         // If no error thrown, login was successful
@@ -29,7 +29,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="font-poppins bg-white w-full h-screen flex flex-col justify-center items-center">
+    <div className="font-poppins bg-white w-full h-screen flex flex-col justify-center items-center animate-in fade-in zoom-in-95 duration-700">
       <div className="card flex flex-col justify-center items-center w-[90%] md:w-96 md:h-[30rem] h-[80%] text-center gap-5 p-5">
         <h1 className="text-2xl font-bold text-green-700">LINE LIFF Login</h1>
         <p>สมมติว่านี่คือหน้า line liff login for test dev</p>

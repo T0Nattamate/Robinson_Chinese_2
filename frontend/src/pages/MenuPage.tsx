@@ -65,7 +65,7 @@ const MenuPage = () => {
   };
 
   return (
-    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen md:h-full flex flex-col justify-center items-center relative">
+    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen md:h-full flex flex-col justify-center items-center relative animate-in fade-in duration-700">
       <div className="w-full h-full min-h-[400px] md:w-96 relative bg-white">
         <img src="Poster.png" alt="header1page" className="w-full" />
       </div>

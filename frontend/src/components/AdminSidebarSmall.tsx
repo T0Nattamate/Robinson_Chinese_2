@@ -2,7 +2,6 @@ import { Menu, MenuItem } from "react-pro-sidebar";
 import { LuLogOut } from "react-icons/lu";
 import { IoReceiptOutline } from "react-icons/io5";
 import { IoBarChartOutline } from "react-icons/io5";
-//import { GoTrophy } from "react-icons/go";
 import { GoPencil } from "react-icons/go";
 import { BsTruck } from "react-icons/bs";
 import { PiGear, PiUserListLight, PiStorefront } from "react-icons/pi";
@@ -21,120 +20,139 @@ const AdminSidebarSmall: React.FC<AdminSidebarSmallProps> = ({
   setIsSidebarOpen,
 }) => {
   const { clearAuth } = useAuthStore();
-  //role from adminStore
   const { adminData, clearAdminData } = useAdminStore();
   const { role } = adminData;
 
   let isSuperAdmin = null;
   let isSecretAdmin = false;
-  if (role == "superAdmin") {
+  if (role === "superAdmin") {
     isSuperAdmin = true;
     isSecretAdmin = false;
-  } else if (role == "branchAdmin") {
+  } else if (role === "branchAdmin") {
     isSuperAdmin = false;
     isSecretAdmin = false;
-  } else if (role == "secretAdmin") {
+  } else if (role === "secretAdmin") {
     isSuperAdmin = null;
     isSecretAdmin = true;
   }
+
+  const menuButtonStyles = {
+    '.ps-menu-button': {
+      borderRadius: '12px',
+      margin: '4px 8px',
+      transition: 'all 0.3s ease',
+      height: '45px',
+      width: '45px',
+      display: 'flex',
+      justifyContent: 'center',
+      '&:hover': {
+        backgroundColor: '#fef2f2 !important',
+        color: 'var(--red) !important',
+      },
+    },
+    '.ps-active .ps-menu-button': {
+      backgroundColor: '#fef2f2 !important',
+      color: 'var(--red) !important',
+    }
+  };
+
   return (
     <div
-      className={`fixed top-0 left-0 h-full bg-white  shadow-xl transition-all duration-300 z-40 ${isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+      className={`fixed top-0 left-0 h-full bg-white border-r border-gray-100 shadow-xl transition-all duration-300 z-50 ${isSidebarOpen ? "-translate-x-full" : "translate-x-0 w-[4.5rem]"
         }`}
     >
-      <div className="h-[calc(100vh-2rem)] w-[4.5rem] bg-white min-h-screen shadow-xl shadow-blue-gray-900/5">
-        <Menu className="font-light mt-2 ">
-          <div
-            onClick={() => {
-              setIsSidebarOpen(true);
-            }}
-            className=" border-b-slate-200 border-b w-full flex justify-end p-3 absolute cursor-pointer md:text-white md:hover:text-black duration-200"
-          >
-            <MdOutlineKeyboardDoubleArrowRight size={25} />
+      <div className="flex flex-col h-full items-center py-6">
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="p-2 mb-8 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600 shadow-sm border border-gray-50"
+        >
+          <MdOutlineKeyboardDoubleArrowRight size={24} />
+        </button>
+
+        {/* Logo Icon */}
+        <div className="mb-8 px-2 cursor-pointer" onClick={() => setIsSidebarOpen(true)}>
+          <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white shadow-lg overflow-hidden">
+            <img src="/logo 1.png" alt="R" className="w-8 object-contain scale-150" />
           </div>
-          <div className="p-1 flex flex-col justify-center gap-1 items-start border-b-slate-200 border-b pb-[1rem]">
-            <section
-              className="flex items-center gap-5 cursor-pointer mt-16"
-              onClick={() => {
-                setIsSidebarOpen(true);
-              }}
-            >
-              <div className="flex flex-col items-center">
-                <img src="/logo 1.png" alt="robinsonlogo" />
-              </div>
-            </section>
-          </div>
+        </div>
 
-          {(isSuperAdmin === true || isSuperAdmin === false) && (
-            <MenuItem
-              component={<Link to="/admin/dashboard/receipts" />}
-              icon={<IoBarChartOutline />}
-            ></MenuItem>
-          )}
-
-          {isSuperAdmin === false && (
-            <MenuItem
-              icon={<BsTruck />}
-              component={<Link to="/admin/dashboard/stock" />}
-            >
-              {" "}
-            </MenuItem>
-          )}
-
-          {(isSuperAdmin === true || isSuperAdmin === false) && (
-            <MenuItem
-              icon={<IoReceiptOutline />}
-              component={<Link to="/admin/dashboard/redeem" />}
-            ></MenuItem>
-          )}
-
-          {(isSuperAdmin === false) && (
-            <MenuItem
-              icon={<PiStorefront />}
-              component={<Link to="/admin/dashboard/add-store" />}
-            ></MenuItem>
-          )}
-
-          {isSuperAdmin === true && (
-            <>
+        {/* Menu Items */}
+        <div className="flex-1 overflow-y-auto no-scrollbar">
+          <Menu rootStyles={menuButtonStyles}>
+            {(isSuperAdmin === true || isSuperAdmin === false) && (
               <MenuItem
-                component={<Link to="/admin/dashboard/customers" />}
-                icon={<PiUserListLight size={20} />}
-              ></MenuItem>
-              <MenuItem
-                component={<Link to="/admin/dashboard/create" />}
-                icon={<GoPencil />}
-              >
-                {" "}
-              </MenuItem>
-              {/* <MenuItem
-                icon={<GoTrophy />}
-                component={<Link to="/admin/dashboard/lucky" />}
-              >
-                {" "}
-              </MenuItem> */}
-            </>
-          )}
+                component={<Link to="/admin/dashboard/receipts" />}
+                icon={<IoBarChartOutline size={22} />}
+              />
+            )}
 
-          {isSecretAdmin === true && (
-            <>
+            {isSuperAdmin === false && (
+              <MenuItem
+                icon={<BsTruck size={22} />}
+                component={<Link to="/admin/dashboard/stock" />}
+              />
+            )}
+
+            {(isSuperAdmin === true || isSuperAdmin === false) && (
+              <MenuItem
+                icon={<IoReceiptOutline size={22} />}
+                component={<Link to="/admin/dashboard/redeem" />}
+              />
+            )}
+
+            {isSuperAdmin === false && (
+              <MenuItem
+                icon={<PiStorefront size={22} />}
+                component={<Link to="/admin/dashboard/add-store" />}
+              />
+            )}
+
+            {isSuperAdmin === true && (
+              <>
+                <MenuItem
+                  component={<Link to="/admin/dashboard/customers" />}
+                  icon={<PiUserListLight size={24} />}
+                />
+                <MenuItem
+                  icon={<GoPencil size={22} />}
+                  component={<Link to="/admin/dashboard/create" />}
+                />
+              </>
+            )}
+
+            {isSecretAdmin === true && (
               <MenuItem
                 component={<Link to="/admin/dashboard/secret" />}
-                icon={<PiGear size={20} />}
-              ></MenuItem>
-            </>
-          )}
+                icon={<PiGear size={24} />}
+              />
+            )}
+          </Menu>
+        </div>
 
-          <MenuItem
-            className="text-red-700"
-            icon={<LuLogOut />}
-            component={<Link to="/admin/login" />}
-            onClick={() => {
-              clearAdminData();
-              clearAuth();
-            }}
-          ></MenuItem>
-        </Menu>
+        {/* Logout */}
+        <div className="mt-auto px-2 border-t border-gray-50 pt-4">
+          <Menu rootStyles={{
+            '.ps-menu-button': {
+              borderRadius: '12px',
+              transition: 'all 0.3s ease',
+              color: '#dc2626 !important',
+              '&:hover': {
+                backgroundColor: '#fef2f2 !important',
+                transform: 'scale(1.1)',
+              },
+            }
+          }}>
+            <MenuItem
+              icon={<LuLogOut size={22} />}
+              component={<Link to="/admin/login" />}
+              onClick={() => {
+                clearAdminData();
+                clearAuth();
+              }}
+            />
+          </Menu>
+        </div>
       </div>
     </div>
   );

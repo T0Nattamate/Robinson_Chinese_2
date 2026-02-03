@@ -1,24 +1,20 @@
 /* eslint-disable */
 import { FaRegTrashAlt } from "react-icons/fa";
-
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../store/AdminStore";
 import CreateNewLuckyDialog from "../dialogs/admin/CreateNewLuckyDialog";
-
 import LuckyDialog from "../dialogs/admin/LuckyDialog";
 import ConfirmDeleteLucky from "../dialogs/admin/ConfirmDeleteLucky";
 import { LuckyResponse } from "../../store/AdminStore";
-import { GoTrophy } from "react-icons/go";
+import { GoTrophy, GoPlus } from "react-icons/go";
 
 const CreateLucky = () => {
   const { setUniversalOverlayFalse, setUniversalOverlayTrue, getLuckyByAdmin } =
     useAdminStore();
 
-  //API calling
   const [luckyData, setluckyData] = useState<LuckyResponse[]>([]);
   const [shouldRefetch, setShouldRefetch] = useState<boolean>(false);
 
-  //initial Pagination
   useEffect(() => {
     const getluckyData = async () => {
       try {
@@ -27,56 +23,38 @@ const CreateLucky = () => {
           (item): item is LuckyResponse => !!item
         );
         setluckyData(filteredData);
-        //console.log("fetch create lucky admin", data);
       } catch (error) {
-        //handleError(error);
+        console.error(error);
       }
     };
-
     getluckyData();
-  }, [shouldRefetch]);
+  }, [shouldRefetch, getLuckyByAdmin]);
 
-  //create admin dialog
   const [isCreateAdminOpen, setIsCreateAdminOpen] = useState<boolean>(false);
-
   const handleCreateAdminOpenDialog = () => {
-    setIsCreateAdminOpen(true); //set to open dialog
-    setUniversalOverlayTrue(); //overlay on
+    setIsCreateAdminOpen(true);
+    setUniversalOverlayTrue();
   };
-
   const handleCreateAdminDialogClose = () => {
-    setIsCreateAdminOpen(false); //set to close dialog
-    setUniversalOverlayFalse(); //overlay off
+    setIsCreateAdminOpen(false);
+    setUniversalOverlayFalse();
   };
 
   const refreshData = () => {
     setShouldRefetch((prev) => !prev);
-    //console.log("refreshData");
   };
 
-  //branch admin dialog
   const [isLuckyOpen, setIsBranchAdminOpen] = useState<boolean>(false);
-  const [selectedLucky, setselectedLucky] = useState<LuckyResponse | null>(
-    null
-  );
-
-  // const handleBranchAdminOpenDialog = (admin: LuckyResponse) => {
-  //   setselectedLucky(admin);
-  //   setIsBranchAdminOpen(true);
-  //   setUniversalOverlayTrue();
-  // };
+  const [selectedLucky, setselectedLucky] = useState<LuckyResponse | null>(null);
 
   const handleBranchAdminDialogClose = () => {
     setIsBranchAdminOpen(false);
     setUniversalOverlayFalse();
   };
 
-  //delete admin dialog
-  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] =
-    useState<boolean>(false);
-
-  const handleDeleteAdminOpenDialog = (admin: LuckyResponse) => {
-    setselectedLucky(admin);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState<boolean>(false);
+  const handleDeleteAdminOpenDialog = (lucky: LuckyResponse) => {
+    setselectedLucky(lucky);
     setIsConfirmDeleteOpen(true);
     setUniversalOverlayTrue();
   };
@@ -85,93 +63,80 @@ const CreateLucky = () => {
     setIsConfirmDeleteOpen(false);
     setUniversalOverlayFalse();
   };
+
   return (
-    <div>
-      <section className="mt-0 m-8 ">
-        <div className="flex flex-col md:flex-row gap-3 items-start md:items-end">
-          <h1 className="text-3xl mt-10 text-[var(--ghost-white)]">ส่งรายชื่อผู้โชคดี</h1>
-          <button
-            className="p-2 px-5 bg-[var(--red)] text-white rounded-full flex items-center gap-3"
-            onClick={handleCreateAdminOpenDialog}
-          >
-            <GoTrophy />
-            สร้างรายชื่อผู้โชคดี
-          </button>
+    <div className="p-6 lg:p-10 space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">รายชื่อผู้โชคดี</h1>
+          <p className="text-gray-500 mt-1">ประกาศรายชื่อผู้โชคดีได้รับรางวัลสุดพิเศษประจำสัปดาห์</p>
         </div>
 
-        <div className="w-[18rem]  md:w-full h-full bg-white mt-5 rounded-2xl p-5 text-black overflow-x-auto">
-          <table className="w-full text-center text-xs lg:text-[0.9rem]">
+        <button
+          className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-black transition-all shadow-lg shadow-gray-200 font-bold active:scale-[0.98]"
+          onClick={handleCreateAdminOpenDialog}
+        >
+          <GoPlus size={20} />
+          <span>สร้างรายชื่อผู้โชคดี</span>
+        </button>
+      </div>
+
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[900px]">
             <thead>
-              <tr>
-                <td className="w-10  border-b border-b-slate-400 pb-3">
-                  ลำดับที่
-                </td>
-                <td className="w-28 border-b border-b-slate-400 pb-3">
-                  ชื่อ-นามสกุล
-                </td>
-                <td className="w-5 pl-5 border-b border-b-slate-400 pb-3">
-                  เบอร์โทรศัพท์
-                </td>
-                <td className="w-5 pl-5 border-b border-b-slate-400 pb-3">
-                  โรบินสันสาขา
-                </td>
-                <td className="w-5 pl-5 border-b border-b-slate-400 pb-3">
-                  สัปหาห์ที่ได้รับรางวัล
-                </td>
-                <td className="w-5  border-b border-b-slate-400 pb-3 text-black">
-                  {" "}
-                  ลบ
-                </td>
+              <tr className="bg-gray-50/50 border-b border-gray-100">
+                <th className="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-gray-400">ลำดับ (No.)</th>
+                <th className="px-6 py-5 text-[11px] font-bold uppercase tracking-widest text-gray-400">ข้อมูลผู้โชคดี (Winner Details)</th>
+                <th className="px-6 py-5 text-[11px] font-bold uppercase tracking-widest text-gray-400">สาขา (Branch)</th>
+                <th className="px-6 py-5 text-[11px] font-bold uppercase tracking-widest text-gray-400 text-center">สัปดาห์ที่ได้รับ</th>
+                <th className="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-gray-400 text-right">จัดการ</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {luckyData.length === 0 ? (
-                <tr className=" e">
-                  <td
-                    colSpan={6}
-                    className="w-full border-b border-b-slate-400  h-12 font-light"
-                  >
-                    ไม่พบรายการ
-                  </td>
-                </tr>
+                <tr><td colSpan={5} className="px-8 py-20 text-center text-gray-400 font-medium font-poppins italic">No lucky winners announced yet...</td></tr>
               ) : (
-                <>
-                  {luckyData.map((lucky, index) => {
-                    return (
-                      <tr
-                        className="font-light hover:bg-slate-100 duration-200"
-                        key={index}
+                luckyData.map((lucky, index) => (
+                  <tr key={index} className="group hover:bg-gray-50/50 transition-colors">
+                    <td className="px-8 py-4 whitespace-nowrap">
+                      <span className="text-xs font-bold text-gray-400">#{String(index + 1).padStart(2, '0')}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 border border-amber-100">
+                          <GoTrophy size={18} />
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-gray-900">{lucky.fullname}</div>
+                          <div className="text-[10px] text-gray-400 font-medium mt-0.5">{lucky.phone}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-xs font-medium text-gray-600">{lucky.mostBranchName}</div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="px-3 py-1 bg-red-50 text-[var(--red)] rounded-lg text-[10px] font-black border border-red-100">
+                        WEEK {lucky.week}
+                      </span>
+                    </td>
+                    <td className="px-8 py-4 text-right">
+                      <button
+                        onClick={() => handleDeleteAdminOpenDialog(lucky)}
+                        className="p-2.5 rounded-xl bg-gray-50 text-gray-300 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm"
                       >
-                        <td className="w-10 border-b border-b-slate-400 py-5 text-slate-500">
-                          {index + 1}
-                        </td>
-                        <td className="w-20 border-b border-b-slate-400 py-5">
-                          {lucky.fullname}
-                        </td>
-                        <td className="w-5 border-b border-b-slate-400 py-5 text-slate-600">
-                          {lucky.phone}
-                        </td>
-                        <td className="w-5 border-b border-b-slate-400 py-5 text-slate-600">
-                          {lucky.mostBranchName}
-                        </td>
-                        <td className="w-5 border-b border-b-slate-400 py-5 text-slate-600">
-                          {lucky.week}
-                        </td>
-                        <td
-                          className="w-5 border-b border-b-slate-400 py-5 cursor-pointer text-center"
-                          onClick={() => handleDeleteAdminOpenDialog(lucky)}
-                        >
-                          <FaRegTrashAlt className="inline-block" />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </>
+                        <FaRegTrashAlt size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
         </div>
-      </section>
+      </div>
+
       <CreateNewLuckyDialog
         isCreateAdminOpen={isCreateAdminOpen}
         handleCreateAdminDialogClose={handleCreateAdminDialogClose}

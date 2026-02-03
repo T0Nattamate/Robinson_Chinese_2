@@ -20,7 +20,7 @@ const AdminDashboardLayout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full h-full font-kanit flex bg-[var(--bg)]">
+    <div className="min-h-screen w-full h-full font-kanit flex bg-slate-50">
       {!isSidebarOpen && (
         <div className="z-40">
           <AdminSidebarSmall
@@ -37,9 +37,8 @@ const AdminDashboardLayout = () => {
       {/* Dynamic content here */}
 
       <div
-        className={` transition-all duration-300 ml-16 ${
-          isSidebarOpen ? "xl:ml-64" : "xl:ml-20"
-        } w-full h-full min-h-screen `}
+        className={` transition-all duration-300 ml-16 ${isSidebarOpen ? "xl:ml-64" : "xl:ml-20"
+          } w-full h-full min-h-screen `}
       >
         {/*  */}
         <Outlet />

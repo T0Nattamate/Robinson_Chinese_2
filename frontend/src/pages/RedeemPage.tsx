@@ -188,7 +188,7 @@ const RedeemPage = () => {
   };
 
   return (
-    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative pb-10">
+    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative pb-10 animate-in fade-in duration-700">
       {isLoading && <LoadingOverlay />}
       <div className="w-full h-full min-h-[400px] md:w-96 relative bg-white">
         <img src="//banner_major.webp" alt="header1page" className="w-full" />

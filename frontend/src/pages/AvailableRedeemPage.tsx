@@ -84,7 +84,7 @@ const AvailableRedeemPage = () => {
   };
 
   return (
-    <div className="font-kanit bg-[var(--primary)] w-full min-h-screen h-full flex flex-col justify-start items-center relative">
+    <div className="font-kanit bg-[var(--primary)] w-full min-h-screen h-full flex flex-col justify-start items-center relative animate-in fade-in duration-700">
       <div className="w-auto h-auto md:h-[25rem] relative">
         <img
           src="/header-06.png"

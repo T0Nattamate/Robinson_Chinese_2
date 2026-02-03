@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const SuccessUpload = () => {
   return (
-    <div className="font-kanit bg-[var(--bg)] min-h-screen flex flex-col items-center">
+    <div className="font-kanit bg-[var(--bg)] min-h-screen flex flex-col items-center animate-in fade-in zoom-in-95 duration-700">
       {/* Header Container - Full width for image */}
       <div className="w-full h-full min-h-[300px]  md:w-96 ">
         <img src="success_header.png" alt="header1page" className="w-full" />

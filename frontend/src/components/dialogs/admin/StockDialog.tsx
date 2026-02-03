@@ -65,9 +65,11 @@ const StockDialog: React.FC<StockDialogProps> = ({
       setChecked(stock.isEnable);
       // Check redeemId
       if (stock.redeemId === "redeem001") {
-        setRedeemName("Movie Ticket");
-      } else if(stock.redeemId === "redeem002"){
-        setRedeemName("Gift Voucher");
+        setRedeemName("บัตรชมภาพยนตร์ 2 ใบ");
+      } else if (stock.redeemId === "redeem003") {
+        setRedeemName("ส่วนลดค่ากำเหน็จ 40%");
+      } else if (stock.redeemId === "redeem004") {
+        setRedeemName("ส่วนลดค่ากำเหน็จ 500.-");
       }
     }
   }, [stock, isStockOpen]);
@@ -102,7 +104,7 @@ const StockDialog: React.FC<StockDialogProps> = ({
       } as {
         adminId: string;
         branchId: string;
-        redeemId:string;
+        redeemId: string;
         amount: number;
         isEnable?: boolean;
       };
@@ -161,10 +163,12 @@ const StockDialog: React.FC<StockDialogProps> = ({
                         <img
                           src={
                             stock?.redeemId === "redeem001"
-                              ? "/ตั๋ว 2 ใบ.png"
-                              : stock?.redeemId === "redeem002"
-                              ? "/Gift Voucher.png"
-                              : "/no_image.png"
+                              ? "/ตั๋วคู่.png"
+                              : stock?.redeemId === "redeem003"
+                                ? "/คูปอง 1.png"
+                                : stock?.redeemId === "redeem004"
+                                  ? "/คูปอง 2.png"
+                                  : "/no_image.png"
                           }
                           alt=""
                           className="max-h-full max-w-full object-contain"

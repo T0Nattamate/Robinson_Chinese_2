@@ -28,7 +28,7 @@ const TermsRedeem = () => {
   }, []);
 
   return (
-    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen flex flex-col items-center relative">
+    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen flex flex-col items-center relative animate-in fade-in duration-700">
       {/* Header image container */}
       {/* <div className="w-full bg-white md:w-96 flex items-center justify-center">
         <img

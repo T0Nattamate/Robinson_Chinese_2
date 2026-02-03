@@ -93,7 +93,7 @@ const RedeemHistoryPage = () => {
   };
 
   return (
-    <div className="font-kanit bg-wite w-full min-h-screen flex flex-col justify-start items-center bg-[var(--bg)] relative">
+    <div className="font-kanit bg-wite w-full min-h-screen flex flex-col justify-start items-center bg-[var(--bg)] relative animate-in fade-in duration-700">
       {/* Header */}
       <div className="w-full min-h-[400px] bg-white md:w-96 relative">
         <img src="Poster.png" alt="header1page" className="w-full" />

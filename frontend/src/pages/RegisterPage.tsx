@@ -254,7 +254,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-center items-center relative ">
+    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-center items-center relative animate-in fade-in zoom-in-95 duration-700">
       {/* Overlay for loading */}
       {isLoading && <LoadingOverlay />}
       <div className="w-full h-full min-h-[400px] bg-white md:w-96 ">

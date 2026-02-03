@@ -17,7 +17,7 @@ const SuccessRedeem = () => {
   }, [branchId]);
 
   return (
-    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen flex flex-col items-center relative">
+    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen flex flex-col items-center relative animate-in fade-in zoom-in-95 duration-700">
       {/* Top header area */}
       <div className="w-full h-full min-h-[300px]  md:w-96 ">
         <img src="/success_header.png" alt="header1page" className="w-full" />

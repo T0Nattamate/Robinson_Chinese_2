@@ -165,7 +165,7 @@ const ReceiptHistory = () => {
   };
 
   return (
-    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative">
+    <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative animate-in fade-in duration-700">
       {/* Header */}
       <div className="w-full h-full min-h-[400px] bg-white md:w-96">
         <img src="/Poster.png" alt="header1page" className="w-full" />
