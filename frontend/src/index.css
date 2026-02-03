@@ -10,15 +10,15 @@
 
 
 :root {
-  --bg: #fd2045;
-  --button: #062F29;
-  --text: #000000;
+  --bg: #BB3D3D;
+  --button: #860000;
+  --text: white;
   --term-head: #231f20;
   --light-green: #8EC63F;
   --text-color-disabled: #727272;
   --gold: #ffe11d;
   --black: #000000;
-  --red: #C8102E;
+  --red: #860000;
 }
 
 .button-base {

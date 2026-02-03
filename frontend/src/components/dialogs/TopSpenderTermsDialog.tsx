@@ -53,13 +53,38 @@ const TopSpenderTermsDialog: React.FC<TopSpenderTermsDialogProps> = ({
                     >
                       เงื่อนไข TOP SPENDER
                     </DialogTitle>
-                    
-                    <div className="w-full text-left text-sm font-light mt-6 px-2">
-                      <p className="leading-relaxed text-gray-700">
-                        ผู้มียอดช้อปสูงสุด 27 สาขา (สะสมยอดช้อปตลอดรายการ <span className="font-medium">50,000 บาทขึ้นไป</span>) รับตั๋วเครื่องบินไป-กลับภายในประเทศ สาขาละ 1 รางวัล (รางวัลละ 1 ที่นั่ง) มูลค่ารางวัลละ 15,000 บาท
-                      </p>
-                      <p className="mt-4 leading-relaxed text-gray-600 text-xs">
-                        *เงื่อนไขเป็นไปตามที่กำหนด / โปรดตรวจสอบเงื่อนไขเพิ่มเติม ณ จุดลงทะเบียนภายในศูนย์ฯ / ขอสงวนสิทธิ์ในการเปลี่ยนแปลงเงื่อนไขโดยมิต้องแจ้งให้ทราบล่วงหน้า / บริษัทฯสงวนสิทธิ์ในการเปลี่ยนแปลงเงื่อนไขหรือสิทธิประโยชน์ต่างๆตามที่บริษัทฯเห็นสมควร และเป็นไปตามที่กฎหมายกำหนด รวมถึงความผิดพลาดในการพิมพ์โดยไม่ต้องแจ้งให้ทราบล่วงหน้า
+
+                    <div className="w-full text-left text-sm font-light mt-6 px-2 max-h-[60vh] overflow-y-auto space-y-4">
+                      <div className="space-y-4 text-gray-700 leading-relaxed">
+                        <p>
+                          <span className="font-bold underline">ผู้มียอดช้อปสะสมตลอดรายการ 20,000 บาทขึ้นไป สูงสูด 14 ท่านแรก</span> รับสิทธิ์ดูดวงออนไลน์กับ <span className="font-medium">อ.คฑา ชินบัญชร</span>
+                        </p>
+
+                        <div className="bg-gray-50 p-3 rounded-md border-l-4 border-[var(--button)]">
+                          <p className="font-medium text-[var(--button)]">สิทธิพิเศษเฉพาะบัตรเครดิต เซ็นทรัล เดอะวัน:</p>
+                          <p className="mt-1">
+                            ยอดใช้จ่ายสะสมสะสมตลอดรายการ <span className="font-bold">15,000 บาทขึ้นไป</span> มียอดช้อปสะสมสูงสุด 14 ท่านแรก รับสิทธิ์ดูดวงออนไลน์เช่นกัน
+                          </p>
+                        </div>
+
+                        <ul className="list-disc list-outside ml-4 space-y-2">
+                          <li>
+                            รวมยอดช้อปจาก BU (Tops, Supersports, Auto1, Power Buy, Officemate, B2S) <span className="font-medium">แต่ไม่เกิน 5,000.-</span>
+                          </li>
+                          <li className="text-red-600">
+                            ยกเว้นยอดช้อป จาก Gold & Jewelry, หมวดเสริมความงาม (Beauty Clinic), Education, IT Gadget
+                          </li>
+                          <li>
+                            จำกัดใบเสร็จที่นำมาสะสมไม่เกิน 10 ใบเสร็จ ตลอดแคมเปญ
+                          </li>
+                          <li className="font-medium">
+                            ประกาศผลผู้ที่ได้รับรางวัล Top Spender 14 ท่าน ในวันที่ 10 มี.ค. 69 ทาง Robinson Lifestyle Facebook Page
+                          </li>
+                        </ul>
+                      </div>
+
+                      <p className="mt-6 text-gray-500 text-[10px] italic border-t pt-4">
+                        *เงื่อนไขเป็นไปตามที่กำหนด / โปรดตรวจสอบเงื่อนไขเพิ่มเติม ณ จุดลงทะเบียน / บริษัทฯขอสงวนสิทธิ์ในการเปลี่ยนแปลงเงื่อนไขโดยมิต้องแจ้งให้ทราบล่วงหน้า
                       </p>
                     </div>
 

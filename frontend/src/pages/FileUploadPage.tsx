@@ -47,6 +47,7 @@ import axiosInterceptor from "../utils/axiosInterceptor";
 import { useUserStore } from "../store/userStore";
 import useAuthStore from "../store/AuthStore";
 import useBranchStore from "../store/BranchStore";
+import RulesDialog from "../components/dialogs/RulesDialog";
 
 interface Errors {
   file?: string | null;
@@ -85,6 +86,13 @@ const FileUploadPage = () => {
   const [selectedStore, setSelectedStore] = useState<StoreOption | null>(null);
   const [query, setQuery] = useState("");
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isRulesOpen, setIsRulesOpen] = useState(false);
+
+  const handleRulesDialogClose = () => setIsRulesOpen(false);
+  const handleRulesDialogOpen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsRulesOpen(true);
+  };
 
   const createDisplayName = (storeName: string, category?: string): string => {
     if (category && category.trim()) {
@@ -515,7 +523,7 @@ const FileUploadPage = () => {
 
       {/* Header */}
       <div className="w-full h-full min-h-[400px] md:w-96 relative bg-white">
-        <img src="//banner_major.webp" alt="header1page" className="w-full" />
+        <img src="Poster.png" alt="header1page" className="w-full" />
       </div>
 
       <h1 className="text-3xl text-[var(--text)] pt-8 pb-12 relative">
@@ -633,7 +641,7 @@ const FileUploadPage = () => {
                       setOtherStoreName(newValue);
                     }}
                   />
-                  <div className="text-red-800 text-start text-xs ml-2">
+                  <div className="text-yellow-300 text-start text-xs ml-2">
                     <FieldError>
                       {({ validationDetails }) =>
                         validationDetails.valueMissing
@@ -751,7 +759,7 @@ const FileUploadPage = () => {
                 }
               }}
             />
-            <div className="text-red-800 text-start text-xs ml-2">
+            <div className="text-yellow-300 text-start text-xs ml-2">
               <FieldError>
                 {({ validationDetails }) =>
                   validationDetails.valueMissing ? "กรุณากรอกเลขที่ใบเสร็จ" : ""
@@ -781,7 +789,7 @@ const FileUploadPage = () => {
               }}
               className="flex w-full h-full bg-white select-none rounded-md focus-within::border-teal-500 focus-within:border-2 text-slate-500 pl-5 pr-3 py-1"
             />
-            <div className="text-red-800 text-start text-xs ml-2">
+            <div className="text-yellow-300 text-start text-xs ml-2">
               <FieldError>
                 {({ validationDetails }) =>
                   validationDetails.valueMissing ? "กรุณากรอกจำนวนเงิน" : ""
@@ -850,14 +858,17 @@ const FileUploadPage = () => {
               )}
             </Button>
           </FileTrigger>
-          <p className="text-red-800 text-sm">{error.file}</p>
+          <p className="text-yellow-300 text-sm">{error.file}</p>
         </Form>
 
         <p className="w-full text-center text-xs -mb-2 text-white">
           ดูข้อมูลเพิ่มเติมได้ที่{" "}
-          <Link to="/terms-upload" className="text-blue-600 underline hover:text-blue-700">
+          <button
+            onClick={handleRulesDialogOpen}
+            className="text-blue-600 underline hover:text-blue-700 bg-transparent border-none p-0 cursor-pointer inline font-kanit"
+          >
             ข้อกำหนดและเงื่อนไข
-          </Link>
+          </button>
         </p>
 
         {/* ADD: Step 3) Show the progress bar if > 0% */}
@@ -888,11 +899,16 @@ const FileUploadPage = () => {
         {/* Back Button */}
         <Link
           to="/menu"
-          className="w-[95%] mt-3 transition transform hover:scale-105 focus:outline-none bg-white text-[var(--button)] border-1 border-[var(--button)]   rounded-md p-2"
+          className="w-[95%] mt-3 transition transform hover:scale-105 focus:outline-none bg-white text-[var(--button)] border-1 border-[var(--button)]   rounded-md p-2 text-center no-underline flex items-center justify-center"
         >
           กลับหน้าหลัก
         </Link>
       </div>
+
+      <RulesDialog
+        isRulesOpen={isRulesOpen}
+        handleRulesDialogClose={handleRulesDialogClose}
+      />
     </div>
   );
 };

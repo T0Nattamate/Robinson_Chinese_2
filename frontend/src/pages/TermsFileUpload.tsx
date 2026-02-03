@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect } from "react";
 import useAuthStore from "../store/AuthStore";
 import useBranchStore from "../store/BranchStore";
@@ -41,19 +41,19 @@ const TermsFileUpload = () => {
         />
       </div> */}
       <div className="w-full h-full min-h-[400px] md:w-96 relative bg-white">
-        <img src="//banner_major.webp" alt="header1page" className="w-full" />
+        <img src="Poster.png" alt="header1page" className="w-full" />
       </div>
 
       {/* Overlay behind the card */}
       <BasicOverlay />
 
       {/* Main card */}
-      <div className="relative z-50 flex flex-col justify-start items-center w-11/12 md:w-96 my-6 text-center gap-5 p-7 -mt-90 bg-white rounded-md shadow-md">
-        {/* "Header bar" inside the card */}
-        <div className="absolute top-0 bg-white w-full h-20 rounded-t-md flex items-center justify-center">
+      <div className="relative z-50 flex flex-col justify-start items-center w-11/12 md:w-96 my-6 text-center -mt-24 bg-white rounded-md shadow-md overflow-hidden">
+        {/* "Header bar" - Now relative to flow naturally */}
+        <div className="bg-white w-full h-24 flex items-center justify-center border-b border-gray-100">
           <div className="w-4/5 flex justify-center items-center h-full">
             <img
-              src="logo.png"
+              src="logo 1.png"
               alt="robinsonLogoWhite"
               className="h-20 max-h-full w-auto object-contain"
               style={{ maxWidth: "80%" }}
@@ -61,55 +61,83 @@ const TermsFileUpload = () => {
           </div>
         </div>
 
-        <h1 className="flex flex-row text-md mt-16 text-black py-2 w-full relative ">
-          <p className="px-8 text-start"> รายละเอียด  </p>
-          <p className="text-center"> | </p>
-          <p className="px-5 text-end"> กำหนด เงื่อนไข </p>
-        </h1>
-
+        {/* Image section */}
         <div className="w-full">
-          <img src="/reward_cut.png" alt="luckydraw_aw" className="w-full h-auto" />
+          <img
+            src="tempImageJT8MIY 2.png"
+            alt="luckydraw_aw"
+            className="w-full h-auto"
+          />
         </div>
 
-        <section className="font-light w-full text-sm text-left">
-          <p className="font-medium mb-3">รับสิทธิ์ลุ้นรางวัลใหญ่ รวมมูลค่ากว่า 5 ล้านบาท</p>
-          <p className="text-gray-700 mb-3">เมื่อกิน-ช้อปครบทุก 1,000 บาท</p>
-          <p className="font-medium mb-2">เงื่อนไข:</p>
-          <ul className="list-outside list-decimal mt-2 text-gray-600 pl-3 space-y-2">
-            <li>
-              สินค้าทั้งศูนย์ฯ ทั้งห้างฯ ลดสูงสุด 80% เฉพาะสินค้าที่เข้าร่วมรายการ / เงื่อนไขเป็นไปตามที่แต่ละร้านค้ากำหนด เมื่อกิน-ช้อปรวบรวมใบเสร็จภายในศูนย์ฯ และห้างฯ สะสมครบทุก 1,000 บาท รับ 1 สิทธิ์ลุ้นรางวัลใหญ่
-            </li>
-            <li>
-              รถยนต์ BYD SEALION 6 DM-i จำนวน 1 รางวัล มูลค่า 1,099,900 บาท
-            </li>
-            <li>
-              สร้อยคอทองคำ หนัก 1 บาท จำนวน 10 รางวัล รวมมูลค่า 468,200 บาท (มูลค่าทองคำ ณ วันที่ 4 ก.พ. 68)
-            </li>
-            <li>
-              ตั๋วเครื่องบินไป-กลับ (ระหว่างประเทศ) จำนวน 5 รางวัล (รางวัลละ 2 ที่นั่ง) รวมมูลค่าสูงสุด 250,000 บาท / มูลค่ารางวัลอ้างอิง ณ วันที่สำรองบัตรโดยสาร / เงื่อนไขเป็นไปตามที่สายการบินกำหนด / โปรดตรวจสอบเงื่อนไขเพิ่มเติมกับสายการบิน
-            </li>
-            <li>
-              OPPO Reno 13 Series จำนวน 6 รางวัล, OPPO Watch X Series จำนวน 4 รางวัล รวมมูลค่า 165,990 บาท
-            </li>
-            <li>
-              แพ็คเกจเที่ยวฟรี เซี่ยงไฮ้ ดิสนีย์แลนด์ พร้อมตั๋วเครื่องบินไป-กลับ จำนวน 3 รางวัล (รางวัลละ 2 ท่าน) รวมมูลค่า 150,000 บาท
-            </li>
-            <li>
-              พิเศษสำหรับสมาชิกเดอะวัน, ห้างทองพรีเมี่ยมโกลด์ เยาวราช, เวียตเจ็ท, OPPO, gother รับสิทธิ์ลุ้น X2 / สงวนสิทธิ์เฉพาะลูกค้าที่ให้ข้อมูลครบถ้วนและสามารถติดต่อได้เท่านั้น / สามารถรวมใบเสร็จตลอดรายการที่โรบินสันไลฟ์สไตล์ทุกสาขา (ยกเว้นสาขาจันทบุรี) / สงวนสิทธิ์ไม่รวมใบเสร็จจากการซื้อเพื่อลงทุน, การค้า, ขายส่ง, ใบจองสินค้า, ใบมัดจำสินค้า, การชำระค่าสาธารณูปโภค, การทำธุรกรรมทางการเงินทุกประเภท, การชำระเบี้ยประกัน, การเติมเงินในบัตรเติมเงินทุกชนิด, การใช้บริการบริษัทขนส่งทุกประเภท / ขอสงวนสิทธิ์ในการเปลี่ยนแปลงเงื่อนไข, สินค้า และ/หรือสิทธิพิเศษ ตามที่บริษัทเห็นสมควรและเป็นไปตามที่กฎหมายกำหนด โดยไม่ต้องแจ้งให้ทราบล่วงหน้า / ขอสงวนสิทธิ์ในการให้รางวัลแก่ผู้โชคดีลำดับถัดไป กรณีที่ตรวจสอบพบว่าผู้โชคดีไม่สามารถติดต่อได้ / ผู้โชคดีที่ได้รับรางวัลมูลค่า 1,000 บาทขึ้นไป ต้องชำระภาษี ณ ที่จ่าย 5% ของมูลค่าของรางวัล / ของรางวัลไม่สามารถแลกเปลี่ยนเป็นเงินสด หรือรางวัลอื่นได้ / ผู้โชคดีมีสิทธิ์ได้รับรางวัลสูงสุดเพียงรางวัลเดียวเท่านั้น / พนักงานโรบินสัน, พนักงานในเครือเซ็นทรัลกรุ๊ป, พนักงานของบริษัทคู่ค้า, หรือญาติของพนักงาน และคณะกรรมการในการตัดสิน ไม่มีสิทธิ์เข้าร่วมรายการ / กำหนดจับรางวัลวันที่ 9 ม.ค. 69 ณ ศูนย์การค้าโรบินสันไลฟ์สไตล์ ราชพฤกษ์ / ประกาศรายชื่อผู้โชคดีวันที่ 15 ม.ค. 69 ที่ Facebook Page: Robinson Lifestyle
-            </li>
-            <li>
-              ผู้มียอดช้อปสูงสุด 27 สาขา (สะสมยอดช้อปตลอดรายการ 50,000 บาทขึ้นไป) รับตั๋วเครื่องบินไป-กลับภายในประเทศ สาขาละ 1 รางวัล (รางวัลละ 1 ที่นั่ง) มูลค่ารางวัลละ 15,000 บาท / เงื่อนไขเป็นไปตามที่กำหนด / โปรดตรวจสอบเงื่อนไขเพิ่มเติม ณ จุดลงทะเบียนภายในศูนย์ฯ / ขอสงวนสิทธิ์ในการเปลี่ยนแปลงเงื่อนไขโดยมิต้องแจ้งให้ทราบล่วงหน้า / บริษัทฯสงวนสิทธิ์ในการเปลี่ยนแปลงเงื่อนไขหรือสิทธิประโยชน์ต่างๆตามที่บริษัทฯเห็นสมควร และเป็นไปตามที่กฎหมายกำหนด รวมถึงความผิดพลาดในการพิมพ์โดยไม่ต้องแจ้งให้ทราบล่วงหน้า
-            </li>
-          </ul>
-        </section>
+        <div className="w-full p-7 flex flex-col gap-5">
+          <h1 className="flex flex-row text-md text-black py-2 w-full relative border-t border-b border-gray-100">
+            <p className="px-8 text-start flex-1"> รายละเอียด </p>
+            <p className="text-center"> | </p>
+            <p className="px-5 text-end flex-1"> กำหนด เงื่อนไข </p>
+          </h1>
 
-        <button
-          onClick={handleClick}
-          className="w-70 inline-flex justify-center items-center gap-2 rounded-md bg-[var(--button)] py-2 px-10 text-sm text-white shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-700 transition-colors text-center"
-          type="submit"
-        >
-          ดำเนินการต่อ
-        </button>
+          {/* Text section */}
+          <section className="font-light w-full text-sm text-left">
+            <div className="text-center mb-6">
+              <p className="font-bold text-base text-gray-800">กติกาและเงื่อนไขการร่วมสนุกจากกิจกรรมที่</p>
+              <p className="font-bold text-base text-gray-800">โรบินสันไลฟ์สไตล์ (2 - 24 ก.พ. 69)</p>
+            </div>
+
+            <div className="space-y-6 text-gray-700">
+              {/* Rule 1 */}
+              <div className="flex gap-2">
+                <span className="font-bold">1.</span>
+                <div>
+                  <p>
+                    เมื่อกิน และ ช้อปสะสมใบเสร็จ (ภายในวัน) ครบ 3,500 บาทขึ้นไป รับส่วนลดค่ากำเหน็จ 40% สำหรับซื้อทองรูปพรรณครึ่งสลึงขึ้นไป จากห้างทองหวังโต๊ะกังเยาวราช / จำกัด 100 สิทธิ์ ตลอดแคมเปญ; จำกัด 1 คน / 1 สิทธิ์ / ยกเว้นสาขาสุรินทร์, สมุทรปราการ, สระบุรี, ฉะเชิงเทรา, มุกดาหาร และสกลนคร / รับส่วนลดค่ากำเหน็จ 500 บาท สำหรับซื้อทองรูปพรรณน้ำหนัก 1 บาทขึ้นไป จากห้างทองบางกอกโกลด์ / จำกัด 50 สิทธิ์ ตลอดแคมเปญ; จำกัด 1 คน / 1 สิทธิ์ / เฉพาะสาขาสุรินทร์, ราชบุรี, บ่อวิน, มุกดาหาร, ชลบุรี และปราจีนบุรี / ไม่รวมใบเสร็จ จากห้างสรรพสินค้าโรบินสัน, ร้านค้าในเครือเซ็นทรัล รีเทล, การซื้อทองหรือเพชร, ร้านค้าหมวดเสริมความงาม (Beauty Clinic), Education, IT Gadget / จำกัดใบเสร็จที่นำมาสะสมไม่เกิน 3 ใบเสร็จ / วัน
+                  </p>
+                </div>
+              </div>
+
+              {/* Rule 2 */}
+              <div className="flex gap-2">
+                <span className="font-bold">2.</span>
+                <div>
+                  <p>
+                    เมื่อช้อปสะสมยอด และรวบรวมใบเสร็จภายในวันครบ 2,500 บาท รับคูปองซื้อบัตรชมภาพยนตร์ 1 ที่นั่ง ฟรี 1 ที่นั่ง จาก เอสเอฟ ซีเนม่า / จำกัด 175 สิทธิ์ /สาขา รวม 5,250 ใบตลอดแคมเปญ หรือ รับฟรีบัตรชมภาพยนตร์ 2 ใบ จาก เมเจอร์ ซีนีเพล็ก / จำกัด 150 สิทธิ์ /สาขา รวม 3,300 ใบตลอดแคมเปญ; จำกัด 1 คน ต่อ 1 สิทธิ์ / พิเศษเฉพาะ ยอดใช้จ่ายสะสมต่อวันผ่านบัตรเครดิต เซ็นทรัล เดอะวัน ทั้งยอดรูดเต็มและแบ่งจ่าย 2,500 บาทขึ้นไปต่อวัน รับบัตรชมภาพยนตร์เพิ่มอีก 1 ใบ / ไม่รวมใบเสร็จ จากห้างสรรพสินค้าโรบินสัน, ร้านค้าในเครือเซ็นทรัล รีเทล, การซื้อทองหรือเพชร, ร้านค้าหมวดอาหาร, ร้านค้าหมวดเสริมความงาม (Beauty Clinic), Education, IT Gadget / จำกัดใบเสร็จที่นำมาสะสมไม่เกิน 3 ใบเสร็จ / วัน
+                  </p>
+                </div>
+              </div>
+
+              {/* Rule 3 */}
+              <div className="flex gap-2">
+                <span className="font-bold">3.</span>
+                <div>
+                  <p>
+                    ผู้มียอดช้อปสะสมตลอดรายการ 20,000 บาทขึ้นไป สูงสูด 14 ท่านแรก รับสิทธิ์ดู ดวงออนไลน์กับ อ.คฑา / พิเศษเฉพาะ ยอดใช้จ่ายสะสมต่อวันผ่านบัตรเครดิต เซ็นทรัล เดอะวัน ทั้งยอดรูดเต็มและแบ่งจ่าย สะสมตลอดรายการ 15,000 บาทขึ้นไป และเป็นผู้ที่มียอดช้อปสะสมสูงสุด 14 ท่านแรก ของโรบินสันไลฟ์สไตล์ทุกสาขาที่ร่วมรายการ รับสิทธิ์ดูดวงออนไลน์กับ อ.คฑา / รวมยอดช้อปจาก BU (Tops, Supersports, Auto1, Power Buy, Officemate, B2S) แต่ไม่เกิน 5,000.- / ยกเว้นยอดช้อป จาก Gold & Jewelry, หมวดเสริมความงาม (Beauty Clinic), Education, IT Gadget / จำกัดใบเสร็จที่นำมาสะสมไม่เกิน 10 ใบเสร็จ ตลอดแคมเปญ / ประกาศผลผู้ที่ได้รับรางวัล Top Spender 14 ท่าน ในวันที่ 10 มี.ค. 69 ทาง Robinson Lifestyle Facebook Page
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t italic text-[10px] text-gray-500">
+                หมายเหตุ: สิทธิ์มีจำนวนจำกัด และเงื่อนไขเป็นไปตามที่บริษัทกำหนด ควรตรวจสอบรายละเอียดเพิ่มเติม ณ จุดประชาสัมพันธ์ของศูนย์การค้าอีกครั้งครับ
+              </div>
+            </div>
+          </section>
+
+          {/* Action buttons */}
+          <div className="flex flex-col gap-4 w-full mt-6">
+            <button
+              onClick={handleClick}
+              className="w-full inline-flex justify-center items-center gap-2 rounded-md bg-[var(--button)] py-2 px-10 text-sm text-white shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-700 transition-colors text-center"
+              type="submit"
+            >
+              ดำเนินการต่อ
+            </button>
+            <Link
+              to={"/menu"}
+              className="w-full inline-flex justify-center items-center gap-2 rounded-md bg-white py-2 px-10 text-sm text-[var(--button)] border-1 border-[var(--button)] shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-700 transition-colors text-center"
+            >
+              กลับหน้าหลัก
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

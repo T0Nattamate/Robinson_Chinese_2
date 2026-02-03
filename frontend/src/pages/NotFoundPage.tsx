@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 
 const NotFoundPage = () => {
   return (
-    <div className="font-poppins bg-gray-200 w-full h-screen flex flex-col justify-center items-center">
-      <h4 className="text-9xl text-black font-bold">404</h4>
-      <h1 className="text-3xl font-semibold text-black">
+    <div className="font-poppins text-[var(--text)] bg-[var(--bg)] w-full h-screen flex flex-col justify-center items-center">
+      <h4 className="text-9xl font-bold">404</h4>
+      <h1 className="text-3xl font-semibold">
         Page not found
       </h1>
       <p className="w-[90%] md:w-96 text-center mt-5 text-[var(--secondary)]">

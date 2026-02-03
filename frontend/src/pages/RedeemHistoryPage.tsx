@@ -96,7 +96,7 @@ const RedeemHistoryPage = () => {
     <div className="font-kanit bg-wite w-full min-h-screen flex flex-col justify-start items-center bg-[var(--bg)] relative">
       {/* Header */}
       <div className="w-full min-h-[400px] bg-white md:w-96 relative">
-        <img src="//banner_major.webp" alt="header1page" className="w-full" />
+        <img src="Poster.png" alt="header1page" className="w-full" />
       </div>
 
       <div className="flex flex-col justify-start items-center w-[90%] md:w-96 min-h-screen text-center gap-5 px-3 py-5">
@@ -145,7 +145,7 @@ const RedeemHistoryPage = () => {
             </InfiniteScroll>
           </div>
         ) : (
-          <div className="mt-5 text-center h-32 text-black flex items-center justify-center">
+          <div className="mt-5 text-center h-32 text-[var(--text)] flex items-center justify-center">
             ยังไม่มีประวัติการแลกของรางวัลพิเศษ
           </div>
         )}

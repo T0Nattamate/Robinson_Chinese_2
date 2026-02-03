@@ -59,7 +59,7 @@ const TopspenderPage = () => {
   return (
     <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative">
       <div className="w-full h-full min-h-[400px] bg-white md:w-96">
-        <img src="//banner_major.webp" alt="header1page" className="w-full" />
+        <img src="Poster.png" alt="header1page" className="w-full" />
       </div>
       <h1 className="text-3xl pt-5 pb-5 relative text-[var(--text)]">Top Spender Ranking</h1>
 

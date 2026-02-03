@@ -56,7 +56,7 @@ const RedeemPage = () => {
     if (selectedCategory === 'MOVIE') {
       return {
         name: "บัตรชมภาพยนตร์",
-        image: "/ตั๋ว 2 ใบ.png",
+        image: "ตั๋วคู่.png",
         redeemId: "redeem001",
         deductionText: "1 สิทธิ์"
       };
@@ -64,21 +64,21 @@ const RedeemPage = () => {
       if (selectedGoldType === 'redeem003') {
         return {
           name: "ส่วนลดค่ากำเหน็จ 40%",
-          image: "/Gift Voucher.png",
+          image: "คูปอง 1.png",
           redeemId: "redeem003",
           deductionText: "1 สิทธิ์"
         };
       } else if (selectedGoldType === 'redeem004') {
         return {
           name: "ส่วนลดค่ากำเหน็จ 500.-",
-          image: "/Gift Voucher.png",
+          image: "คูปอง 2.png",
           redeemId: "redeem004",
           deductionText: "1 สิทธิ์"
         };
       } else {
         return {
-          name: "ทองทั้ง 2 รูปแบบ",
-          image: "/Gift Voucher.png",
+          name: "ส่วนลดค่ากำเหน็จ 40% และ 500.- บาท",
+          image: "คูปองคู่.png",
           redeemId: "GOLD_BOTH",
           deductionText: "1 สิทธิ์รวม"
         };
@@ -169,7 +169,7 @@ const RedeemPage = () => {
       );
 
       setIsLoading(false);
-      navigate(`/success-redeem/${combinedBranchId}`);
+      navigate(`/success-redeem/${combinedBranchId}`, { state: { itemName: currentReward.name } });
 
     } catch (error: any) {
       setIsLoading(false);
@@ -387,6 +387,10 @@ const RedeemPage = () => {
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-400">หักสิทธิ์การแลก</span>
                   <span className="font-bold text-red-600">{currentReward.deductionText}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-400">เหลือสต็อกสาขานี้</span>
+                  <span className="font-bold text-black">{stockItem.amount} รางวัล</span>
                 </div>
               </div>
 

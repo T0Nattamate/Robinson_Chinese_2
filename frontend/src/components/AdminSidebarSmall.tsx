@@ -60,7 +60,7 @@ const AdminSidebarSmall: React.FC<AdminSidebarSmallProps> = ({
               }}
             >
               <div className="flex flex-col items-center">
-                <img src="/logo.png" alt="robinsonlogo" />
+                <img src="/logo 1.png" alt="robinsonlogo" />
               </div>
             </section>
           </div>
@@ -88,7 +88,7 @@ const AdminSidebarSmall: React.FC<AdminSidebarSmallProps> = ({
             ></MenuItem>
           )}
 
-          {(isSuperAdmin === true || isSuperAdmin === false) && (
+          {(isSuperAdmin === false) && (
             <MenuItem
               icon={<PiStorefront />}
               component={<Link to="/admin/dashboard/add-store" />}

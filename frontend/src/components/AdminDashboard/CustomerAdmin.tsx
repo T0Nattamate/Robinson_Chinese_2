@@ -50,7 +50,7 @@ const CustomerAdmin = () => {
     fetchInitialCustomerAdmin,
     fetchNextCustomerAdmin,
     downloadCustomerAdmin,
-    downloadCustomerAdminLuckyDraw,
+    //downloadCustomerAdminLuckyDraw,
   } = useAdminStore();
   //pagination
   const [pageSize, setPageSize] = useState("10");
@@ -307,46 +307,46 @@ const CustomerAdmin = () => {
     }
   };
 
-  const handleDownloadExcelLuckyDraw = async () => {
-    try {
-      const formattedStartDate = startDate
-        ? formatDateToYYYYMMDD(startDate)
-        : undefined;
-      const formattedEndDate = endDate
-        ? formatDateToYYYYMMDD(endDate)
-        : undefined;
+  // const handleDownloadExcelLuckyDraw = async () => {
+  //   try {
+  //     const formattedStartDate = startDate
+  //       ? formatDateToYYYYMMDD(startDate)
+  //       : undefined;
+  //     const formattedEndDate = endDate
+  //       ? formatDateToYYYYMMDD(endDate)
+  //       : undefined;
 
-      await downloadCustomerAdminLuckyDraw(
-        phoneFilter,
-        the1Filter !== null ? (the1Filter ? "true" : "false") : null,
-        sortOrder,
-        the1CardFilter,
-        formattedStartDate,
-        formattedEndDate
-      );
+  //     await downloadCustomerAdminLuckyDraw(
+  //       phoneFilter,
+  //       the1Filter !== null ? (the1Filter ? "true" : "false") : null,
+  //       sortOrder,
+  //       the1CardFilter,
+  //       formattedStartDate,
+  //       formattedEndDate
+  //     );
 
-    } catch (error) {
-      let errorMessage = "ไม่พบรายชื่อผู้ใช้ที่ยังไม่เคยได้รับรางวัล";
+  //   } catch (error) {
+  //     let errorMessage = "ไม่พบรายชื่อผู้ใช้ที่ยังไม่เคยได้รับรางวัล";
 
-      if (error instanceof Error) {
-        if (error.message === "Network Error") {
-          errorMessage = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้";
-        } else if (error.message === "No data found") {
-          errorMessage = "ไม่พบข้อมูลสำหรับการดาวน์โหลด";
-        }
-      }
+  //     if (error instanceof Error) {
+  //       if (error.message === "Network Error") {
+  //         errorMessage = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้";
+  //       } else if (error.message === "No data found") {
+  //         errorMessage = "ไม่พบข้อมูลสำหรับการดาวน์โหลด";
+  //       }
+  //     }
 
-      Swal.fire({
-        icon: "error",
-        text: errorMessage,
-        confirmButtonText: "ยืนยัน",
-        customClass: {
-          htmlContainer: "font-kanit",
-          confirmButton: "bg-gray-700 text-white rounded-md font-kanit",
-        },
-      });
-    }
-  };
+  //     Swal.fire({
+  //       icon: "error",
+  //       text: errorMessage,
+  //       confirmButtonText: "ยืนยัน",
+  //       customClass: {
+  //         htmlContainer: "font-kanit",
+  //         confirmButton: "bg-gray-700 text-white rounded-md font-kanit",
+  //       },
+  //     });
+  //   }
+  // };
 
   useEffect(() => {
     setLastVisibleStack([]);
@@ -468,10 +468,10 @@ const CustomerAdmin = () => {
             <div className="w-full flex gap-3 md:flex-row flex-col ">
               <div
                 className={`w-44 h-10 gap-3 flex justify-center items-center rounded-md mt-0 cursor-pointer  ${the1Filter === null
-                    ? "bg-[#95a59f] text-white"
-                    : the1Filter === true
-                      ? "bg-[var(--button)] text-red-600"
-                      : "bg-[var(--button)] text-white"
+                  ? "bg-[#95a59f] text-white"
+                  : the1Filter === true
+                    ? "bg-[var(--button)] text-white"
+                    : "bg-yellow-500 text-white"
                   }`}
                 onClick={() => {
                   setThe1Filter((prev) => {
@@ -520,14 +520,14 @@ const CustomerAdmin = () => {
 
                 <p className="text-white">ดาวน์โหลด</p>
               </div>
-              <div
+              {/* <div
                 className="cursor-pointer flex items-center w-full justify-center md:w-auto gap-2 p-1 py-2 border-2 rounded-lg border-white  bg-amber-500 h-10 "
                 onClick={handleDownloadExcelLuckyDraw}
               >
                 <FiDownload color="white" size={20} />
 
                 <p className="text-white w-40">ดาวน์โหลด Luckydraw</p>
-              </div>
+              </div> */}
             </div>
           </section>
         </section>

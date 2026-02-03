@@ -58,7 +58,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </div>
         <div className="w-full  h-32 mt-14 relative flex items-center justify-center">
           <img
-            src="/logo.png"
+            src="/logo 1.png"
             alt="robinson campaign logo"
             className="w-[89%]"
           />

@@ -4,8 +4,8 @@ const SuccessUpload = () => {
   return (
     <div className="font-kanit bg-[var(--bg)] min-h-screen flex flex-col items-center">
       {/* Header Container - Full width for image */}
-      <div className="w-full h-full min-h-[400px]  md:w-96 ">
-        <img src="banner_cut.webp" alt="header1page" className="w-full" />
+      <div className="w-full h-full min-h-[300px]  md:w-96 ">
+        <img src="success_header.png" alt="header1page" className="w-full" />
       </div>
 
       {/* Main Content - Centered with specific width */}
@@ -13,21 +13,21 @@ const SuccessUpload = () => {
         {/* <div className="text-xl  w-full h-20 ">
           <img src="icon_Receipt.png" alt="header1page" className="w-full" />
         </div> */}
-        
+
         <h1 className="text-3xl font-poppins font-medium text-[var(--text)]">
           SUCCESS!
         </h1>
         <h1 className="text-3xl  ">ขอบคุณที่ร่วมสนุกกับกิจกรรม</h1>
         <div className=" flex items-center justify-center w-44 mt-10">
-          <img src="success_icon.png" alt="successUpload" className="w-60" />
+          <img src="tempImagejOecHH_1-removebg-preview.png" alt="successUpload" className="w-60" />
         </div>
         <p className="font-light  text-base w-full">
           ตรวจสอบสถานะการลงทะเบียนได้ หลังลงทะเบียนแล้ว 24 ชม. <br></br>
         </p>
 
         <p className="font-light  text-base w-full">
-          กรุณาเก็บใบเสร็จไว้เพื่อยืนยันตัวตน และติดตามการประกาศ <br></br> 
-          รายชื่อผู้โชคดีในวันที่ 15 ม.ค. 69
+          กรุณาเก็บใบเสร็จไว้เพื่อยืนยันตัวตน และติดตามการประกาศ <br></br>
+          ผู้ที่ได้รับรางวัล Top Spender 14 ท่าน ในวันที่ 10 มี.ค. 69
           <br></br>
           ผ่านช่องทาง Facebook Page Robinson Lifestyle, <br></br>
           Line Official และจุดประชาสัมพันธ์ภายในศูนย์ฯ
@@ -39,7 +39,7 @@ const SuccessUpload = () => {
             className=" button-base bg-[var(--dark-green)] text-white w-full "
             type="submit"
           >
-           <button className="bg-[var(--button)]  text-xl text-white w-full px-4 py-3 rounded-md hover:bg-gray-800 transition">
+            <button className="bg-[var(--button)]  text-xl text-white w-full px-4 py-3 rounded-md hover:bg-gray-800 transition">
               ส่งใบเสร็จเพิ่มเติม
             </button>
           </Link>

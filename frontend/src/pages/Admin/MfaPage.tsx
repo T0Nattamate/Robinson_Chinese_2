@@ -83,13 +83,13 @@ const MfaPage = () => {
   return (
     <div className="font-kanit bg-white w-full h-full min-h-screen flex  justify-center items-center relative">
       {isLoading && <LoadingOverlay />}
-      <div className="hidden  lg:w-full h-full min-h-screen bg-cover bg-center lg:flex items-center justify-center bg-[var(--bg)]"
+      <div className="hidden  lg:w-full h-full min-h-screen bg-cover bg-center lg:flex items-center justify-center bg-[var(--red)]"
         style={{
           backgroundImage: `url('/bg-02.jpg')`, backgroundPosition: "center 10rem"
         }}
       >
         <img
-          src="//banner_cut.webp"
+          src="/ปกมีข้อความ.png"
           alt="garnierlogo"
           className="w-full h-full"
         />

@@ -67,7 +67,7 @@ const MenuPage = () => {
   return (
     <div className="font-kanit bg-[var(--bg)] w-full min-h-screen md:h-full flex flex-col justify-center items-center relative">
       <div className="w-full h-full min-h-[400px] md:w-96 relative bg-white">
-        <img src="//banner_major.webp" alt="header1page" className="w-full" />
+        <img src="Poster.png" alt="header1page" className="w-full" />
       </div>
       <div className="flex flex-col justify-center items-center w-[90%] md:w-96 md:h-full text-center gap-5 py-5">
         <h1 className="text-3xl text-[var(--text)]">Home</h1>
@@ -94,7 +94,7 @@ const MenuPage = () => {
               className="w-[90%] transition transform hover:scale-105"
             >
               <img
-                src="btn_1.png"
+                src="อัปโหลดใบเสร็จ.png"
                 alt="ลุ้นรางวัล"
                 className="w-full rounded-md drop-shadow-md"
               />
@@ -118,7 +118,7 @@ const MenuPage = () => {
               className="w-[90%] transition transform hover:scale-105"
             >
               <img
-                src="btn_2.png"
+                src="แลกรับของสมนาคุณ.png"
                 alt="แลกรับของสมนาคุณ"
                 className="w-full rounded-md drop-shadow-md"
               />
@@ -131,7 +131,7 @@ const MenuPage = () => {
           ) : (
             <div className="w-[90%] opacity-60 cursor-not-allowed relative">
               <img
-                src="btn_2.png"
+                src="แลกรับของสมนาคุณ.png"
                 alt="แลกรับของสมนาคุณ"
                 className="w-full rounded-md drop-shadow-md filter grayscale"
               />
@@ -167,7 +167,7 @@ const MenuPage = () => {
           className="w-[90%] transition transform hover:scale-105"
         >
           <img
-            src="btn_3.png"
+            src="ประวัติการเข้าร่วมกิจกรรม.png"
             alt="ประวัติการร่วมกิจกรรม"
             className="w-full rounded-md drop-shadow-md"
           />
@@ -178,18 +178,27 @@ const MenuPage = () => {
           className="w-[90%] transition transform hover:scale-105"
         >
           <img
-            src="btn_4.png"
+            src="ประวัติแลกรับ.png"
             alt="ประวัติการแลกรับของสมนาคุณ"
             className="w-full rounded-md drop-shadow-md"
           />
         </Link>
-
+        <Link
+          to="/top-spender"
+          className="w-[90%] transition transform hover:scale-105"
+        >
+          <img
+            src="ตรวจสอบรายชื่อ Top.png"
+            alt="ตรวจสอบรายชื่อ Top spender"
+            className="w-full rounded-md drop-shadow-md"
+          />
+        </Link>
         {/* <button
           onClick={handleAnnounceClick}
           className="w-[90%] transition transform hover:scale-105 border-0 p-0 bg-transparent"
         >
           <img
-            src="btn_5.png"
+            src=" btn_5.png"
             alt="ประกาศรางวัล"
             className="w-full rounded-md drop-shadow-md"
           />

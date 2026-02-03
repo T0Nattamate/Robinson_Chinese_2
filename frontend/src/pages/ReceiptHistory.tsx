@@ -168,7 +168,7 @@ const ReceiptHistory = () => {
     <div className="font-kanit bg-[var(--bg)] w-full min-h-screen h-full flex flex-col justify-start items-center relative">
       {/* Header */}
       <div className="w-full h-full min-h-[400px] bg-white md:w-96">
-        <img src="//banner_major.webp" alt="header1page" className="w-full" />
+        <img src="/Poster.png" alt="header1page" className="w-full" />
       </div>
 
       <h1 className="text-3xl text-center text-[var(--text)] relative pt-5 pb-5">
@@ -196,183 +196,85 @@ const ReceiptHistory = () => {
           </button>
         </Link>
 
-        {/* Table container (allow horizontal scroll on mobile) */}
-        <div className="relative min-w-[22rem]  h-full w-full overflow-x-auto">
-          {items.length > 0 ? (
-            <table className=" border-separate text-center rounded-lg border-spacing-0 text-black min-w-[30rem] bg-white">
+        {/* Modern Table Container */}
+        <div className="w-full bg-white rounded-2xl shadow-xl animate-in fade-in slide-in-from-bottom-5 duration-700">
+          <div className="overflow-x-auto p-1">
+            {items.length > 0 ? (
               <InfiniteScroll
                 dataLength={items.length}
                 next={fetchMoreData}
                 hasMore={hasMore}
-                loader={
-                  <tr>
-                    <td colSpan={11} className="text-center"></td>
-                  </tr>
-                }
-                endMessage={<></>}
+                loader={<div className="h-10 w-full flex items-center justify-center text-xs text-gray-400">กำลังโหลด...</div>}
+                endMessage={<div className="py-4 text-center text-[10px] text-gray-400 font-light">สิ้นสุดประวัติการร่วมกิจกรรม</div>}
               >
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b rounded-tl-lg text-xs h-10 w-[15rem]">
-                      วันที่อัพโหลด
-                    </th>
-                    <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b text-xs w-[15rem]">
-                      สาขาโรบินสัน
-                    </th>
-                    <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b text-xs w-[8rem]">
-                      เลขที่ใบเสร็จ
-                    </th>
-                    <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b text-xs w-[15rem]">
-                      ยอดซื้อ
-                    </th>
-                    <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b text-xs w-[12rem]">
-                      ร้านค้า
-                    </th>
-                    <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b text-xs w-[15rem]">
-                      วันที่ออกใบเสร็จ
-                    </th>
-                    <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b text-xs w-[10rem]">
-                      ภาพใบเสร็จ
-                    </th>
-                    {/* <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b text-xs w-[10rem]">
-                      สิทธิ์ลุ้นรางวัล
-                    </th>
-                    <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b text-xs w-[10rem]">
-                      สิทธิ์แลกซื้อ
-                    </th>
-                    <th className="px-4 py-2 border-[var(--black)] border-l border-t border-b text-xs w-[10rem]">
-                      สิทธิ์ VIP
-                    </th> */}
-                    <th className="px-4 py-2 border-[var(--black)] border border-t border-b rounded-tr-lg text-xs w-[9rem]">
-                      สถานะทางแอดมิน
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody className="font-light text-center text-[0.65rem]">
-                  {items.map((item, index) => {
-                    const statusDetails = getStatusDetails(item.status);
-                    const isLastRow = index === items.length - 1;
-
-                    return (
-                      <tr key={item.receiptId} className="hover:bg-gray-50">
-                        {/* 1) วันที่อัพโหลด */}
-                        <td
-                          className={`px-2 py-2 ${isLastRow
-                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b rounded-bl-lg"
-                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                            }`}
-                        >
-                          {formatThaiDateTime(item.uploadedAt)}
-                        </td>
-                        {/* 2) สาขาโรบินสัน */}
-                        <td
-                          className={`px-2 py-2 ${isLastRow
-                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                            }`}
-                        >
-                          {item.branchName}
-                        </td>
-                        {/* 3) เลขที่ใบเสร็จ */}
-                        <td
-                          className={`px-2 py-2 ${isLastRow
-                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                            }`}
-                        >
-                          {item.receiptNo}
-                        </td>
-                        {/* 4) ยอดซื้อ */}
-                        <td
-                          className={`px-2 py-2 ${isLastRow
-                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                            }`}
-                        >
-                          {formatNumber(parseFloat(item.amount))}฿
-                        </td>
-                        {/* 5) ร้านค้า */}
-                        <td
-                          className={`px-2 py-2 ${isLastRow
-                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                            }`}
-                        >
-                          {item.storeName}
-                        </td>
-                        {/* 6) วันที่ออกใบเสร็จ */}
-                        <td
-                          className={`px-4 py-2 ${isLastRow
-                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                            }`}
-                        >
-                          {item.receiptDate}
-                        </td>
-                        {/* 7) ภาพใบเสร็จ */}
-                        <td
-                          className={`px-2 py-2 underline text-blue-600 cursor-pointer ${isLastRow
-                            ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                            : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                            }`}
-                          onClick={() => handleOpenDialog(item.receiptImage)}
-                        >
-                          Pick link
-                        </td>
-                        {/* 8) สิทธิ์ลุ้นรางวัล */}
-                        {/* <td
-                          className={`px-2 py-2 justify-items-center ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
-                        >
-                          {renderBooleanIcon(item.canLuckydraw)}
-                        </td> */}
-                        {/* 9) สิทธิ์แลกซื้อ */}
-                        {/* <td
-                          className={`px-2 py-2 justify-items-center ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
-                        >
-                          {renderBooleanIcon(item.canBag)}
-                        </td> */}
-                        {/* 10) สิทธิ์ VIP */}
-                        {/* <td
-                          className={`px-2 py-2 justify-items-center ${
-                            isLastRow
-                              ? "border-l-[var(--black)] border-l border-b-[var(--black)] border-b"
-                              : "border-l-[var(--black)] border-l border-b border-b-slate-300"
-                          }`}
-                        >
-                          {renderBooleanIcon(item.canVip)}
-                        </td> */}
-                        {/* 11) สถานะทางแอดมิน */}
-                        <td
-                          className={`px-2 py-2 border-r border-black ${isLastRow
-                            ? "border-[var(--black)] border-l border-r-[var(--black)] border-b  rounded-br-lg"
-                            : "border-l-[var(--black)] border-l border-r-[var(--black)] border-b border-b-slate-300"
-                            } flex items-center justify-center gap-2 py-10`}
-                        >
-                          {statusDetails?.icon}
-                          <p className="whitespace-nowrap">
-                            {statusDetails?.text}
-                          </p>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
+                <table className="w-full text-left border-collapse min-w-[800px]">
+                  <thead>
+                    <tr className="bg-gray-50/50 border-b border-gray-100">
+                      <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap">วันที่อัพโหลด</th>
+                      <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap">สาขา</th>
+                      <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap">เลขที่ใบเสร็จ</th>
+                      <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap">วันที่ออกใบเสร็จ</th>
+                      <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap text-right">ยอดซื้อ</th>
+                      <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap">ร้านค้า</th>
+                      <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap text-center">ภาพ</th>
+                      <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap text-center">สถานะ</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {items.map((item) => {
+                      const statusDetails = getStatusDetails(item.status);
+                      return (
+                        <tr key={item.receiptId} className="hover:bg-gray-50/80 transition-colors group">
+                          <td className="px-5 py-4 whitespace-nowrap">
+                            <div className="text-xs font-medium text-gray-900">{formatThaiDateTime(item.uploadedAt)}</div>
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap">
+                            <div className="text-xs text-gray-600">{item.branchName}</div>
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap">
+                            <div className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md inline-block">
+                              {item.receiptNo}
+                            </div>
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap">
+                            <div className="text-xs text-gray-600">{item.receiptDate}</div>
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap text-right">
+                            <div className="text-xs font-bold text-gray-900">{formatNumber(parseFloat(item.amount))} ฿</div>
+                          </td>
+                          <td className="px-5 py-4 min-w-[150px]">
+                            <div className="text-xs text-gray-600 break-words">{item.storeName}</div>
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap text-center">
+                            <button
+                              onClick={() => handleOpenDialog(item.receiptImage)}
+                              className="text-xs text-blue-500 hover:text-blue-700 font-medium underline decoration-blue-500/30 underline-offset-4"
+                            >
+                              ดูรูป
+                            </button>
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap text-center">
+                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-medium
+                              ${item.status === 'approved' ? 'bg-green-50 text-green-700 border border-green-100' :
+                                item.status === 'pending' ? 'bg-slate-50 text-slate-700 border border-slate-100' :
+                                  'bg-red-50 text-red-700 border border-red-100'}`}>
+                              {statusDetails?.icon}
+                              <span>{statusDetails?.text}</span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </InfiniteScroll>
-            </table>
-          ) : (
-            <div className="my-3 text-black h-32 flex justify-center items-center">
-              ไม่พบประวัติการร่วมกิจกรรม
-            </div>
-          )}
+            ) : (
+              <div className="py-20 text-center">
+                <div className="text-gray-400 mb-2 text-2xl">📭</div>
+                <div className="text-sm text-gray-500">ไม่พบประวัติการร่วมกิจกรรม</div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* STATUS Description */}

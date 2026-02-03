@@ -258,13 +258,13 @@ const RegisterPage = () => {
       {/* Overlay for loading */}
       {isLoading && <LoadingOverlay />}
       <div className="w-full h-full min-h-[400px] bg-white md:w-96 ">
-        <img src="//banner_major.webp" alt="header1page" className="w-full" />
+        <img src="/Poster.png" alt="header1page" className="w-full" />
       </div>
 
 
       {/* Content */}
       <div className=" flex flex-col justify-start items-center w-[90%] md:w-96 md:h-[34rem] min-h-[40rem] text-center gap-5 py-5 px-2 mt-5 ">
-        <h1 className="text-3xl text-[var(--text)]">ลงทะเบียน</h1>
+        <h1 className="text-3xl text-white">ลงทะเบียน</h1>
         <Form
           className="flex flex-col items-center gap-8 w-full"
           onSubmit={handleRegisterSubmit}
@@ -299,7 +299,7 @@ const RegisterPage = () => {
                 *ชื่อ-นามสกุล
               </Label> */}
               <div className="w-full mt-1 text-start">
-                <FieldError className="text-red-800 text-xs md:text-sm">
+                <FieldError className="text-yellow-300 text-xs md:text-sm">
                   กรุณากรอกชื่อ-นามสกุล
                 </FieldError>
               </div>
@@ -330,7 +330,7 @@ const RegisterPage = () => {
                 *เบอร์โทรศัพท์
               </Label> */}
               <div className="mt-1">
-                <FieldError className="text-red-800 text-xs md:text-sm text-start">
+                <FieldError className="text-yellow-300 text-xs md:text-sm text-start">
                   {error.phone && <p>{error.phone}</p>}
                 </FieldError>
               </div>
@@ -391,7 +391,7 @@ const RegisterPage = () => {
               </Label> */}
               <div className="mt-1">
                 <Checkbox onChange={handleTheOne}>
-                  <span className="text-[var(--text)]">เป็นสมาชิก The1 Card</span>
+                  <span className="text-white">เป็นสมาชิก The1 Card</span>
                 </Checkbox>
               </div>
             </TextField>
@@ -405,12 +405,12 @@ const RegisterPage = () => {
           {/* Checkboxes */}
           <section className="flex flex-col gap-3 w-full">
             <Checkbox onChange={handleTermsCheckboxChange}>
-              <span className="text-[var(--text)]">
+              <span className="text-white">
                 ยอมรับเงื่อนไข-นโยบายการให้ข้อมูลส่วนตัว
               </span>
             </Checkbox>
             <Checkbox onChange={handleRulesCheckboxChange}>
-              <span className="text-[var(--text)]">
+              <span className="text-white">
                 ยอมรับเงื่อนไขและกติกาการร่วมกิจกรรม
               </span>
             </Checkbox>
@@ -419,7 +419,7 @@ const RegisterPage = () => {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="flex text-lg justify-center transition transform hover:scale-105 focus:outline-none bg-[var(--button)] text-white rounded-lg w-[90%] p-1"
+            className="flex text-lg justify-center transition transform hover:scale-105 focus:outline-none bg-[var(--red)] text-white rounded-lg w-[90%] p-1"
           >
             Register
           </Button>
