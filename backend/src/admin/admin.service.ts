@@ -357,28 +357,41 @@ export class AdminService {
   }
 
   async recalculateTopSpenderAmount(prisma: Prisma.TransactionClient, lineId: string) {
+    // === OLD IMPLEMENTATION (10-receipt limit) - COMMENTED OUT ===
     // Fetch FIRST 10 receipts by upload time (regardless of status)
-    const first10Receipts = await prisma.receipt.findMany({
+    // const first10Receipts = await prisma.receipt.findMany({
+    //   where: {
+    //     lineId,
+    //   },
+    //   orderBy: { uploadedAt: 'asc' },
+    //   take: 10,
+    // });
+    //
+    // // Filter to only approved receipts within those first 10
+    // const approvedReceipts = first10Receipts.filter(r => r.status === 'approved');
+    // === END OLD IMPLEMENTATION ===
+
+    // === NEW IMPLEMENTATION (No limit) - ACTIVE ===
+    // Fetch ALL approved receipts (no limit)
+    const approvedReceipts = await prisma.receipt.findMany({
       where: {
         lineId,
+        status: 'approved',
       },
       orderBy: { uploadedAt: 'asc' },
-      take: 10,
     });
 
-    // Filter to only approved receipts within those first 10
-    const approvedReceipts = first10Receipts.filter(r => r.status === 'approved');
-
     let totalPoints = 0;
-    let slotsUsed = 0;
+    //let slotsUsed = 0; // Keep for tracking, though no longer enforcing limit
     let buTotal = 0;
     const BU_CAP = 5000;
-    const MAX_SLOTS = 10;
+    // const MAX_SLOTS = 10; // OLD: Uncomment to re-enable 10-receipt limit
 
     const TOP_SPENDER_BLACKLIST = ['GOLD_JEWELRY', 'BEAUTY_CLINIC', 'EDUCATION', 'IT_GADGET'];
 
+    // Process ALL approved receipts without limit
     for (const r of approvedReceipts) {
-      if (slotsUsed >= MAX_SLOTS) break;
+      // if (slotsUsed >= MAX_SLOTS) break; // OLD: Uncomment to re-enable 10-receipt limit
 
       const amount = Number(r.amount);
       const store: any = await prisma.store.findFirst({
@@ -398,11 +411,11 @@ export class AdminService {
           const contribution = Math.min(amount, BU_CAP - buTotal);
           totalPoints += contribution;
           buTotal += contribution;
-          slotsUsed++;
+          //slotsUsed++;
         }
       } else {
         totalPoints += amount;
-        slotsUsed++;
+        //slotsUsed++;
       }
     }
 
