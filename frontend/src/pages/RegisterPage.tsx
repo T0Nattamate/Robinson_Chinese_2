@@ -198,17 +198,27 @@ const RegisterPage = () => {
     //   }
     // }
 
-    if (!isTermsAccepted) {
+    if (!isTermsAccepted || !isRulesAccepted) {
+      let errorMessage = "";
+
+      if (!isTermsAccepted && !isRulesAccepted) {
+        errorMessage = "กรุณายอมรับเงื่อนไข-นโยบายการให้ข้อมูลส่วนตัว และเงื่อนไขและกติกาการร่วมกิจกรรม";
+      } else if (!isTermsAccepted) {
+        errorMessage = "กรุณายอมรับเงื่อนไข-นโยบายการให้ข้อมูลส่วนตัว";
+      } else {
+        errorMessage = "กรุณายอมรับเงื่อนไขและกติกาการร่วมกิจกรรม";
+      }
+
       Swal.fire({
         icon: "error",
-        text: "กรุณายอมรับเงื่อนไขและกติการเข้าร่วมกิจกรรม",
+        text: errorMessage,
         confirmButtonText: "ยืนยัน",
         customClass: {
           htmlContainer: "font-kanit",
           confirmButton: "bg-gray-700 text-white rounded-md font-kanit",
         },
       });
-      //alert("Please accept the terms and conditions.");
+      return; // Prevent form submission
     } else {
       //console.log("Form submitted successfully:", register);
 
